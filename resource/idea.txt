@@ -1,0 +1,39 @@
+ *로 붙여둔 건 어떻게 처리할지 잘 모르겠는 것.
+
+ - 사용자 table
+user table : id, user id, user pw, 이름, 신고 개수, 신상
+ * 속한 방 번호
+
+ - 채팅방 정보 table
+room_info table : id, type, 출발시간, 도착시간, 출발지, 도착지, 현재 인원, 총 인원, 현재 짐 개수, 총 짐 개수, 확정 상태, 신고
+ * 속한 사람 번호 -> 
+ * 채팅 로그 -> chat_log_identifier를 만들어서 채팅 로그 table에 LEFT JOIN?
+
+ - 채팅 로그 table
+chat_log table : 채팅방 id(어떤 방에서 했는지), 발화자, 시간, 채팅 내용
+room_info에 chat_log ON room_info.id == chat_log.id를 하면 채팅방에서의 대화 내용을 뽑아낼 수 있을 것.
+
+ - 신고 로그 table
+report table : id, 피신고자 id, 신고자 id, 채팅 로그 식별 id(채팅방 id)
+
+정도로 나누고
+
+사용자 table에서는 사용자가 어떤 방에 속해있는지에 대한 정보가 필요하고,
+채팅방 정보 table에서도 각 방에 어떤 사용자가 있는지에 대한 정보가 필요하다.
+http://egloos.zum.com/sweeper/v/3002133
+위 링크에서 이런 관계를 '다대다' 관계라고 하며, INNER JOIN 2개를 겹쳐 해결할 수 있을 것이라 한다.
+
+ - 사용자-채팅방 교집합 table
+intersect_user_room table : id, user id, room id
+이렇게 나누고, 사용자가 추가되면 user table에 넣고, 채팅방이 추가되면 room_info table에 넣고
+만약 사용자가 어떤 채팅방에 접속하면 intersect_user_room table에 추가하자
+그러면 user id로 SELECT하면 각 user가 어떤 room에 있는지 알 수 있고
+room id로 SELECT하면 각 room에 어떤 user가 있는지 알 수 있을 것이다.
+
+해봐야 하는건
+ express를 이용한 배포
+ socket io + redis + mysql을 이용해서 채팅 기능
+
+mysql의 INDEX(색인)기능을 사용하면 데이터를 자동으로 관리해주기 때문에 저장할 떄는 시간이 좀 더 들지만 빼낼 때 굉장히 빨라진다고 한다. 특히 검색같은 기능 사용할 때 좋다고 한다.
+정렬은 sql문의 ORDER 기능을 이용할 수 있다.
+또, LIMIT 기능을 이용해서 한 번에 가져올 데이터를 한정시켜 DB의 부담을 줄일 수 있다고 한다. 게시판 같은데서 아래로 드래그하면 한번에 다 뜨는 게 아니라 조금씩 뜨는 게 이런 기능인 것 같다.

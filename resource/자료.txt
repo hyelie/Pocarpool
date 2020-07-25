@@ -1,0 +1,27 @@
+ - 채팅 schema
+https://www.phpschool.com/gnuboard4/bbs/board.php?bo_table=qna_db&wr_id=220493&sca=&sfl=wr_subject%7C%7Cwr_content&stx=%B9%AB%C7%D1&sop=and
+
+ - nodejs를 이용한 db에 채팅내용 저장
+https://programmerdaddy.tistory.com/66
+
+ - nodejs + socket.io를 이용한 채팅
+https://medium.com/wasd/node-js%EC%99%80-socket-io%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%B1%84%ED%8C%85-%EA%B5%AC%ED%98%84-1-cb215954847b
+
+ - 실시간 채팅방 만들기
+https://wi-fi.tistory.com/entry/%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%B1%84%ED%8C%85%EB%B0%A9-%EB%A7%8C%EB%93%A4%EA%B8%B0-NodeJS-Express-Redis-Socketio-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0
+"""
+NodeJS <-> Socket : 서버와 클라이언트 간의 소켓 통신
+
+Express : 웹 서버 프레임워크 용도
+
+Mysql <-> Redis <-> NodeJS : 실시간 채팅 내역은 Redis에 저장, 일정 주기별로 DB로 저장
+"""
+
+ - socket io를 이용한 채팅
+https://geundung.dev/58
+
+ - socket io + express를 이용한 채팅 서버
+https://www.slideshare.net/ssuserf64d04/nodeexpress
+
+ - socket io를 이용한 채팅
+https://m.blog.naver.com/wlsdml1103/221281438496
