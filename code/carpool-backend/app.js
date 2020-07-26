@@ -39,3 +39,4 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+// node ./bin/www를 하면 실행됨.
