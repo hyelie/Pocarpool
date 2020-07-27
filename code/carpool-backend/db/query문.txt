@@ -1,0 +1,96 @@
+서버 시작 시
+CREATE DATABASE IF NOT EXISTS carpoolDB;
+USE carpoolDB;
+CREATE TABLE IF NOT EXISTS users(
+  id                INT(11)     NOT NULL AUTO_INCREMENT,
+  name              VARCHAR(20) NOT NULL,
+  report_num        INT(6)      DEFAULT 0 NOT NULL,
+  isAdmin           BOOL        DEFAULT false NOT NULL,
+  PRIMARY KEY(id)
+);
+CREATE TABLE IF NOT EXISTS roominfos(
+  id                    INT(11)     NOT NULL AUTO_INCREMENT,
+  car_type              VARCHAR(3)  NOT NULL,
+  depart_place          VARCHAR(50) NOT NULL,
+  arrive_place          VARCHAR(50) NOT NULL,
+  depart_time           DATETIME    NOT NULL,
+  arrive_time           DATETIME    NOT NULL,
+  current_headcount     INT(2)      NOT NULL,
+  total_headcount       INT(2)      NOT NULL,
+  curreunt_carrier_num  INT(2)      NOT NULL,
+  total_carrier_num     INT(2)      NOT NULL,
+  userId                INT(11)     NOT NULL,
+  isConfirm             BOOL        NOT NULL,
+  confirm_time          DATETIME    NOT NULL,
+  PRIMARY KEY(id)
+);
+CREATE TABLE IF NOT EXISTS users_and_rooms_infos(
+  id                INT(11)     NOT NULL AUTO_INCREMENT,
+  userId            INT(11)     NOT NULL,
+  roomId            INT(11)     NOT NULL,
+  PRIMARY KEY(id)
+);
+CREATE TABLE IF NOT EXISTS chatlogs(
+  id                INT(11)     NOT NULL AUTO_INCREMENT,
+  roomId            INT(11)     NOT NULL,
+  userId            INT(11)     NOT NULL,
+  chat_send_time    DATETIME    NOT NULL,
+  chat_content      TEXT        NOT NULL,
+  isWorkDone        BOOL        NOT NULL DEFAULT false,
+  PRIMARY KEY(id)
+);
+CREATE TABLE IF NOT EXISTS reports(
+  id                INT(11)     NOT NULL AUTO_INCREMENT,
+  reportId          INT(11)     NOT NULL,
+  accusedId         INT(11)     NOT NULL,
+  roomId            INT(11)     NOT NULL,
+  PRIMARY KEY(id)
+);
+
+
+
+chatlogs table의 id 초기화
+ALTER TABLE chatlogs AUTO_INCREMENT=1;
+SET @COUNT=0;
+UPDATE chatlogs SET id = @COUNT:=@COUNT+1;
+
+
+
+사용자 추가
+CREATE USER '사용자'@'localhost(또는 %)' IDENTIFIED BY '비밀번호';
+CREATE USER 'poapper'@'%' IDENTIFIED BY 'poapper';
+FLUSH privileges;
+
+
+
+사용자 권한 추가
+  사용자별로 보거나 수정할 수 있는 DB가 다르기 때문에 설정해 주어야 한다.
+GRANT SELECT ON DB이름.테이블명 TO '사용자'@'localhost';
+GRANT UPDATE(컬럼1, 컬럼2) ON DB이름.테이블명 to '사용자'@'localhost';
+
+
+
+auto increment로 지정한 primary key id값은 data를 삭제해도 자동으로 재정렬되지 않는다. 재정렬 하는 예시
+CREATE TABLE IF NOT EXISTS temp(
+  id INT(10) NOT NULL AUTO_INCREMENT,
+  text TEXT NOT NULL,
+  PRIMARY KEY(id)
+);
+INSERT INTO temp(text) VALUES ("1번");
+INSERT INTO temp(text) VALUES ("2번");
+INSERT INTO temp(text) VALUES ("3번");
+INSERT INTO temp(text) VALUES ("4번");
+INSERT INTO temp(text) VALUES ("5번");
+INSERT INTO temp(text) VALUES ("6번");
+INSERT INTO temp(text) VALUES ("7번");
+INSERT INTO temp(text) VALUES ("8번");
+SELECT * FROM temp;
+DELETE FROM temp WHERE id=5;
+SELECT * FROM temp;
+INSERT INTO temp(text) VALUES ("9번");
+INSERT INTO temp(text) VALUES ("10번");
+SELECT * FROM temp;
+ALTER TABLE temp AUTO_INCREMENT=1;
+SET @COUNT=0;
+UPDATE temp SET id = @COUNT:=@COUNT+1;
+SELECT * FROM temp;
