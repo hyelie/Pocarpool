@@ -6,6 +6,7 @@ const pool = mysql.createPool({
   password : 'poapper',
   multipleStatements : true
 })
+
 exports.connection = function(callback){
   pool.getConnection(function(err, connection){
     if(!err){
@@ -14,6 +15,31 @@ exports.connection = function(callback){
   });
 }
 
+exports.checkQuery = {
+  checkDBs : `SHOW DATABASES;`,
+  checkTables : `USE carpoolDB; SHOW TABLES;`,
+}
+
+exports.exeQuery = {
+  initMysql : function(DB){
+    console.log("pool에서 Schema 여부를 확인 후 carpoolDB 생성");
+    
+    /* DB((err1, connection1)=>{
+      connection1.query(initQuery.checkSchema, (error1) =>{
+        if (error1) throw error;
+        console.log("carpoolDB 생성 완료\ncarpoolDB에서 Table 여부를 확인한 후 tables 생성");
+        DB((err2, connection2) => {
+          connection2.query(initQuery.checkTable, (error2) => {
+            if (error2) throw error2;
+            console.log("tables 생성 완료");
+          });
+          connection2.release();
+        });
+      });
+      connection1.release();
+    }); */
+  }
+}
 
 // users table의 memberID, memberPW는 임시 값.
 var initQuery = {
@@ -62,29 +88,4 @@ var initQuery = {
     PRIMARY KEY(id)
   );`,
   chatlog_rearrange : `ALTER TABLE chatlogs AUTO_INCREMENT=1; SET @COUNT=0; UPDATE chatlogs SET id = @COUNT:=@COUNT+1;`
-}
-
-exports.checkQuery = {
-  checkDBs : `SHOW DATABASES;`,
-  checkTables : `USE carpoolDB; SHOW TABLES;`,
-}
-
-exports.exeQuery = {
-  initMysql : function(DB){
-    console.log("pool에서 Schema 여부를 확인 후 carpoolDB 생성");
-    DB((err1, connection1)=>{
-      connection1.query(initQuery.checkSchema, (error1) =>{
-        if (error1) throw error;
-        console.log("carpoolDB 생성 완료\ncarpoolDB에서 Table 여부를 확인한 후 tables 생성");
-        DB((err2, connection2) => {
-          connection2.query(initQuery.checkTable, (error2) => {
-            if (error2) throw error2;
-            console.log("tables 생성 완료");
-          });
-          connection2.release();
-        });
-      });
-      connection1.release();
-    });
-  }
 }
