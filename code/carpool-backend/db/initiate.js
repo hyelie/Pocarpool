@@ -1,14 +1,47 @@
-var mysql = require('mysql')
-
-exports.connection = mysql.createConnection({
-    host : 'localhost',
-    user : 'poapper',
-    password : 'poapper',
-    multipleStatements : true
+var mysql = require('mysql');
+const { connect } = require('../app');
+const pool = mysql.createPool({
+  host : 'localhost',
+  user : 'poapper',
+  password : 'poapper',
+  multipleStatements : true
 })
 
+exports.connection = function(callback){
+  pool.getConnection(function(err, connection){
+    if(!err){
+      callback(err, connection);
+    }
+  });
+}
 
+exports.checkQuery = {
+  checkDBs : `SHOW DATABASES;`,
+  checkTables : `USE carpoolDB; SHOW TABLES;`,
+}
 
+exports.exeQuery = {
+  initMysql : function(DB){
+    console.log("pool에서 Schema 여부를 확인 후 carpoolDB 생성");
+    
+     DB((err1, connection1)=>{
+      connection1.query(initQuery.checkSchema, (error1) =>{
+        if (error1) throw error;
+        console.log("carpoolDB 생성 완료\ncarpoolDB에서 Table 여부를 확인한 후 tables 생성");
+        DB((err2, connection2) => {
+          connection2.query(initQuery.checkTable, (error2) => {
+            if (error2) throw error2;
+            console.log("tables 생성 완료");
+          });
+          connection2.release();
+        });
+      });
+      connection1.release();
+    }); 
+  }
+}
+
+// users table의 memberID, memberPW는 임시 값.
 var initQuery = {
   checkSchema : `CREATE DATABASE IF NOT EXISTS carpoolDB; USE carpoolDB`,
   checkTable : `CREATE TABLE IF NOT EXISTS users(
@@ -16,6 +49,8 @@ var initQuery = {
     name              VARCHAR(20) NOT NULL,
     report_num        INT(6)      DEFAULT 0 NOT NULL,
     isAdmin           BOOL        DEFAULT false NOT NULL,
+    memberID          VARCHAR(20) NOT NULL UNIQUE,
+    memberPW          VARCHAR(20) NOT NULL,
     PRIMARY KEY(id)
   );  CREATE TABLE IF NOT EXISTS roominfos(
     id                    INT(11)     NOT NULL AUTO_INCREMENT,
@@ -53,23 +88,4 @@ var initQuery = {
     PRIMARY KEY(id)
   );`,
   chatlog_rearrange : `ALTER TABLE chatlogs AUTO_INCREMENT=1; SET @COUNT=0; UPDATE chatlogs SET id = @COUNT:=@COUNT+1;`
-}
-
-exports.checkQuery = {
-  checkDBs : `SHOW DATABASES`,
-  checkTables : `SHOW TABLES`
-}
-
-exports.exeQuery = {
-  initMysql : function(DB){
-    console.log("DB에서 Schema 여부를 확인 후 carpoolDB 생성");
-    DB.query(initQuery.checkSchema, (error) => {
-      if (error) throw error;
-      console.log("carpoolDB 생성 완료\ncarpoolDB에서 Table 여부를 확인한 후 tables 생성");
-      DB.query(initQuery.checkTable, (error) => {
-        if (error) throw error;
-        console.log("tables 생성 완료");
-      });
-    });
-  }
 }
