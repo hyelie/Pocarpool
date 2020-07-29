@@ -31,38 +31,4 @@ router.get('/DBcheck', function(req, res, next){
   });
 });
 
-// 로그인
-router.get('/login', function(req, res, next) {
-  res.send(template.login);
-});
-
-// 회원가입
-router.get('/register', function(req, res, next) {
-  res.send(template.register);
-});
-
-// 회원가입 단계
-router.post('/register_process', function(req, res, next) {
-  var username = req.body.name;
-  var userid = req.body.id;
-  var userpw = req.body.pwd;
-
-  DB((poolerr, connection) =>{
-    if(!poolerr){
-      console.log("확인할거야!", username, userid, userpw);
-      var adduserquery = `INSERT INTO carpoolDB.users(name, memberID, memberPW) VALUES (?, ?, ?)`;
-      connection.query(adduserquery, [username, userid, userpw],  function(err, results, fields){
-        if(err){
-          console.log("이미 존재하는 ID입니다!");
-        } else{
-          console.log("등록 완료~");
-        }
-        connection.release();
-      });
-    }
-  });
-
-  
-});
-
 module.exports = router;

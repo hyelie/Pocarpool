@@ -16,7 +16,7 @@ exports.template = {
     login : `
     <!doctype html>
     <html>
-    <form name="LoginDatas" method="post" action="./login">
+    <form name="LoginDatas" method="post" action="./login_process">
         <p> 로그인 창입니다. </p>
         <p> - 아이디를 입력해 주세요.</p>
         <p><input type="text" name="id" placeholder="ID"></p>
@@ -27,6 +27,6 @@ exports.template = {
     </html>`,
     home : `
     <html>
-    <p> <a href="/login">Login</a> <a href="/register">Register</a> <p>
+    <p> <a href="/auth/login">Login</a> <a href="/auth/register">Register</a> <p>
     </html>`
 }

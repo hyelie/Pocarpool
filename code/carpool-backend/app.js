@@ -3,8 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require('express-session');
+const passport = require('passport');
+const passportConfig = require('./passport/passport');
 
 var indexRouter = require('./routes/index');
+var authRouter = require('./routes/auth');
 var usersRouter = require('./routes/users');
 var roomlistRouter = require('./routes/roomlist');
 
@@ -20,7 +24,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 간단한 기능이기 때문에 대충 설정했음, passport 활성화
+app.use(session({secret : "noh02NOI1", resave : true, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+passportConfig();
+
 app.use('/', indexRouter);
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/roomlist', roomlistRouter);
 
