@@ -17,17 +17,6 @@ router.get('/', function(req, res, next) {
     // 2. DB.query로 보내서 출력 가져오기
     // 3. 사용자에게 json 형식으로 출력하기
 
-    /*
-    DB.query('SELECT * FROM users',(err, rows, fields)=>{
-        error will be an Error if one occurred during the query
-        rows will contain the results of the query
-        fields will contain information about the returned results fields (if any)
-
-        console.log(rows)
-        console.log(fields)
-    })
-    */
-
     // 1. MySql query문 만들기
     var property = ``
     property = property + ((req.query.depart_place != undefined) ? `depart_place='${req.query.depart_place}'` : ``)
