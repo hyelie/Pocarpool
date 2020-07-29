@@ -54,6 +54,10 @@ ALTER TABLE chatlogs AUTO_INCREMENT=1;
 SET @COUNT=0;
 UPDATE chatlogs SET id = @COUNT:=@COUNT+1;
 
+ALTER TABLE users AUTO_INCREMENT=1;
+SET @COUNT=0;
+UPDATE users SET id = @COUNT:=@COUNT+1;
+
 
 
 사용자 추가
