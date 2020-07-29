@@ -1,0 +1,13 @@
+<form action="http://localhost:3000/roomlist" method="post" accept-charset="utf-8">
+  <label for="fname">car_type:</label>
+  <input type="text" id="car_type" name="car_type"><br><br>
+  <label for="fname">depart_place:</label>
+  <input type="text" id="depart_place" name="depart_place"><br><br>
+  <label for="fname">arrive_place:</label>
+  <input type="text" id="arrive_place" name="arrive_place"><br><br>
+  <label for="fname">depart_time:</label>
+  <input type="text" id="depart_time" name="depart_time"><br><br>
+  <label for="fname">arrive_time:</label>
+  <input type="text" id="arrive_time" name="arrive_time"><br><br>
+  <input type="submit" value="Submit">
+</form>
