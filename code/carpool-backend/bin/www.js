@@ -5,8 +5,8 @@
 var app = require('../app');
 var debug = require('debug')('carpool-backend:server');
 var http = require('http');
-var connection = require('../db/initiate').connection;
-var initDB = require('../db/initiate').exeQuery;
+// var connection = require('../db/initiate').connection;
+// var initDB = require('../db/initiate').exeQuery;
 
 /**
  * Get port from environment and store in Express.
@@ -18,8 +18,11 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-connection.connect();
-initDB.initMysql(connection);
+// connection.connect();
+// initDB.initMysql(connection);
+
+  require('../db/db_connect').init()
+
  // 만약 서버에 database와 schema가 없으면 만들어 주어야 함. 만들고 출력하는 조건문을 여기 넣자.
 var server = http.createServer(app);
 
