@@ -8,6 +8,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  console.log("로그인 확인", req.user);
   res.send(template.home);
   //res.render('index', { title: 'Express' });
 });
