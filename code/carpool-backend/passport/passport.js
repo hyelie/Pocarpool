@@ -42,12 +42,10 @@ module.exports = () => {
                 if (result.length == 0) {
                     console.log("존재하지 않는 ID입니다.");
                     return done(null, false, { message: '존재하지 않는 ID입니다.' });
-                }
-                else if (result[0].memberPW != password) {
+                } else if (result[0].memberPW != password) {
                     console.log("비밀번호가 틀렸습니다.");
                     return done(null, false, { message: '비밀번호가 틀렸습니다.' });
-                }
-                else {
+                } else {
                     console.log("성공!");
                     req.user = result[0];
                     return done(null, result);

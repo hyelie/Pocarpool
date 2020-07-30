@@ -25,8 +25,22 @@ exports.template = {
         <p><input type="submit"></p>
     </form>
     </html>`,
-    home : `
-    <html>
-    <p> <a href="/auth/login">Login</a> <a href="/auth/register">Register</a> <p>
-    </html>`
+    home : function(req){
+        if(this.isLogin(req)){
+            return `
+            <html>
+            <p> <a href="/auth/logout">Logout</a> <p>
+            <p> hello, ${req.user.name} <p>
+            </html>`;
+        } else{
+            return `
+            <html>
+            <p> <a href="/auth/login">Login</a> <a href="/auth/register">Register</a> <p>
+            </html>`;
+        }
+    },
+    isLogin : (req)=>{
+        if(req.user == undefined) return false;
+        else return true;
+    }
 }

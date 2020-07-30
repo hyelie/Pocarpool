@@ -43,12 +43,6 @@ app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/roomlist', roomlistRouter);
 
-// 로그인 단계
-app.post('/auth/login_process', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/auth/login'
-}));
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

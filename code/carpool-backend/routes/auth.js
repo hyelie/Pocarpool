@@ -17,7 +17,7 @@ router.get('/login', function (req, res, next) {
 router.post('/login_process', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/auth/login'
-  }));
+}));
 
 // 회원가입
 router.get('/register', function (req, res, next) {
@@ -45,10 +45,18 @@ router.post('/register_process', function (req, res, next) {
             });
         }
     });
-
     res.status(200);
     res.redirect('/');
     res.end();
+});
+
+// 로그아웃
+router.get('/logout', function (req, res, next) {
+    console.log("로그아웃");
+    req.logout();
+    req.session.destroy(function(err){
+        res.redirect('/');
+    });
 });
 
 module.exports = router;
