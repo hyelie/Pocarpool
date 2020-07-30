@@ -105,7 +105,7 @@ router.put('/', (req, res) => {
 
     console.log(req.body);
     var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-    var updateData = [req.body.car_type, req.body.depart_place, req.body.arrive_place, req.body.depart_time, req.body.depart_place, req.body.current_headcount, req.body.current_carrier_num, req.body.total_carrier_num, req.body.isConfirm, req.body.isConfirm_time];
+    var updateData = [req.body.car_type, req.body.depart_place, req.body.arrive_place, req.body.depart_time, req.body.depart_place, req.body.current_headcount, req.body.total_headcount, eq.body.current_carrier_num, req.body.total_carrier_num, req.body.isConfirm, req.body.isConfirm_time];
 
     // PUT /roomlist 입력 값 에러 : 2
     if (updateQueryArray.every(undefined) || !regExp.test(updateData[3]) || !regExp.test(updateData[4])) {
@@ -135,12 +135,15 @@ router.put('/', (req, res) => {
                     } else {
                         console.log("업데이트 완료");
                     }
+                    res.status(200)
                     res.redirect('/login');
                     connection.release();
                 })
             }
         });
     }
+
+    res.end()
 });
 
 // DELETE /roomlist
@@ -161,13 +164,14 @@ router.delete('/', (req, res) => {
                 } else {
                     console.log("삭제 완료");
                 }
+                res.status(200)
                 res.redirect('/login');
                 connection.release();
             })
         }
     });
 
-    res.send('DELETE /roomlist');
+    res.end();
 });
 
 
@@ -177,8 +181,20 @@ router.get('/userid', function (req, res, next) {
     if (req.user == undefined) {
         next(new Error('GET /roomlist error:0'));
     }
+
+    // admin이 아닌데 다른 id로 접근하는 경우에는 에러
+    if(req.user.isAdmin == 0 && req.query.id != req.user.id){
+        // TODO : 접근 오류
+        next(new Error('GET /roomlist error:2'));
+    } else{
+        // SELECT * FROM roominfos LEFT JOIN roomuserinfos ON roominfos.id = roomuserinfos.id WHERE roomuserinfos.userid = ?
+        // userid가 속한 방에 대한 정보 출력
+       //  var belongQuery = `SELECT * FROM carpoolDB.`
+    }
+
     res.send('GET /roomlist?');
 });
+
 // POST /roomlist/userid
 router.post('/userid', function (req, res, next) {
     // TODO : 로그인 에러
