@@ -91,6 +91,9 @@ router.post('/',(req,res,next)=>{
 
 // PUT /roomlist
 router.put('/',(req,res)=>{
+    if(req.user == undefined){
+        res.redirect('/');
+    }
     // UPDATE tablename SET column1 = value1, column2 = value2, ... WHERE condition
     res.send('PUT /roomlist');
 
