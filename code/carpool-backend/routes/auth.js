@@ -10,17 +10,19 @@ const passport = require('passport');
 // 일단 간단하게 짠거니까 url 및 보안은 크게 신경쓰지 마세요, 통합 로그인 구축되면 수정합니다.
 // 로그인
 router.get('/login', function (req, res, next) {
+    res.status(200);
     res.send(template.login);
 });
 
 // 로그인 단계
 router.post('/login_process', passport.authenticate('local', {
-    successRedirect: '/',
+    successRedirect: '/login',
     failureRedirect: '/auth/login'
 }));
 
 // 회원가입
 router.get('/register', function (req, res, next) {
+    res.status(200);
     res.send(template.register);
 });
 
@@ -50,6 +52,9 @@ router.post('/register_process', function (req, res, next) {
 
 // 로그아웃
 router.get('/logout', function (req, res, next) {
+    if(req.user == undefined){
+        res.redirect('/');
+    }
     console.log("로그아웃");
     req.logout();
     req.session.destroy(function(err){

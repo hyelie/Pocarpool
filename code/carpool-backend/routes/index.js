@@ -8,9 +8,21 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  console.log("로그인 확인", req.user);
-  res.send(template.home(req));
-  //res.render('index', { title: 'Express' });
+  if(req.user == undefined){
+    console.log("로그인 확인", req.user);
+    res.send(template.home(req));
+  } else{
+    res.redirect('/login');
+  }
+});
+
+router.get('/login', function(req, res, next) {
+  if(req.user == undefined){
+    res.redirect('/');
+  } else{
+    console.log("로그인 확인", req.user);
+    res.send(template.home(req));
+  }
 });
 
 router.get('/DBcheck', function(req, res, next){
