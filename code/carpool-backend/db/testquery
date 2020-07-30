@@ -43,5 +43,5 @@ INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(5, 6);
 SELECT * FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ?
 userid = ?에 해당하는 사람이 속한 방의 정보를 얻어온다.
 
-SELECT car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
+SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
 FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ?;

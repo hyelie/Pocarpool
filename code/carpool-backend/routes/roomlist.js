@@ -196,7 +196,7 @@ router.get('/userid', function (req, res, next) {
         next(new Error('GET /roomlist error:2'));
     } else{
         // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
-        var belongQuery = `SELECT car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
+        var belongQuery = `SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
         FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ?;`
         DB((err, connection) => {
             if(err){
