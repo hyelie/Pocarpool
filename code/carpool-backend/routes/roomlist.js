@@ -49,12 +49,12 @@ router.get('/', function (req, res, next) {
             connection.query(sql,element, (err, rows, fields) => {
                 if (err) throw err;
                 console.log(rows)
-                connection.release();
-
+                
                 res.json(rows) // 3. 사용자에게 json 형식으로 출력하기
                 res.status(200).end()
             })
         }
+        connection.release();
     })
 });
 
@@ -91,10 +91,11 @@ router.post('/', (req, res, next) => {
             if (!err1) {
                 connection.query(sql,[car_type,depart_place,arrive_place,depart_time,arrive_time], (err2, rows, fields) => {
                     if (err2) throw err2;
-                    connection.release();
+                    
                 })
             }
         })
+        connection.release();
         res.status(200)
         //res.redirect('/')
         res.end()
@@ -148,9 +149,9 @@ router.put('/', (req, res) => {
                     }
                     res.status(200)
                     res.redirect('/login');
-                    connection.release();
                 })
             }
+            connection.release();
         });
     }
 
@@ -181,9 +182,9 @@ router.delete('/', (req, res) => {
                 }
                 res.status(200)
                 res.redirect('/login');
-                connection.release();
             })
         }
+        connection.release();
     });
 
     res.end();
@@ -220,8 +221,9 @@ router.get('/userid', function (req, res, next) {
                     console.log("id에 해당하는 사람이 속해있는 방의 정보 출력", result);
                     res.json(result);
                     res.status(200).end();
-                })
+                });
             }
+            connection.release();
         });
     }
 });
@@ -257,8 +259,9 @@ router.post('/userid', function (req, res, next) {
                     }
                     res.json(result);
                     res.status(200).end();
-                })
+                });
             }
+            connection.release();
         });
     }
 });
@@ -267,6 +270,28 @@ router.delete('/userid', (req, res) => {
     // TODO : 로그인 에러
     if (req.user == undefined) {
         next(new Error('DELETE /roomlist/userid error:0'));
+    }else{
+        // query
+        var deleteQuery = `DELETE FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ?;`;
+        DB((err, connection) => {
+            if (err) {
+                // TODO : DB에 접근 못 할때
+                console.log("DELETE /roomlist/userid error : 서버 이용자가 너무 많습니다.")
+            }
+            if (!err) {
+                connection.query(deleteQuery, [req.body.userID, req.body.roomID], (sqlErr) => {
+                    if (sqlErr) {
+                        // TODO : sql 내부 에러 처리
+                        console.log("DELETE /roomlist/userid error : SQL 내부 에러. query를 확인해 주세요.");
+                    } else {
+                        console.log("삭제 완료");
+                    }
+                    res.status(200)
+                    res.redirect('/login');
+                });
+            }
+            connection.release();
+        });
     }
     res.send('DELETE /roomlist/userid');
 });
