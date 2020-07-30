@@ -1,3 +1,4 @@
+/* DB 예제 입력 */
 INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡1','포항역1','2020-07-30 07:15:01','2020-07-30 07:15:01',0,1,0,1,0,'2020-07-30 07:15:01');
 INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
@@ -17,13 +18,6 @@ INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람3", "people
 INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람4", "people4", "people4");
 INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람5", "people5", "people5");
 
-임의대로 지곡n의 n을 방 번호 사람n의 n을 사람 번호라고 매겼다.
-사람 1 : 방 2, 4
-사람 2 : 방 1, 2, 5
-사람 3 : 방 6
-사람 4 : 방 1, 2, 4, 6
-사람 5 : 방 3, 5, 6
-
 INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(1, 2);
 INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(1, 4);
 INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(2, 1);
@@ -38,10 +32,35 @@ INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(5, 3);
 INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(5, 5);
 INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(5, 6);
 
-
+임의대로 지곡n의 n을 방 번호 사람n의 n을 사람 번호라고 매겼다.
+사람 1 : 방 2, 4
+사람 2 : 방 1, 2, 5
+사람 3 : 방 6
+사람 4 : 방 1, 2, 4, 6
+사람 5 : 방 3, 5, 6
 
 SELECT * FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ?
 userid = ?에 해당하는 사람이 속한 방의 정보를 얻어온다.
 
+사용하면 되는 query
 SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
-FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ?;
+FROM carpooldb.roominfos INNER JOIN carpooldb.users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ? ORDER BY depart_time ASC;
+
+/* 특정 table에서 값이 있는지 없는지를 검사한 후 삽입 */
+1. user가 존재하지 않는 경우
+2. room이 존재하지 않는 경우
+3. user가 이미 room에 들어가 있는 경우
+에는 query가 실행되면 안됨. 나머지 경우에는 실행해야 함.
+
+아래는 user가 없거나, room이 없거나, 이미 있는 값이면 빈 DB를 리턴하고,
+user가 있고, room이 있고, 없는 값일 때만 값 있는 DB를 리턴.
+
+INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT 2, 3 FROM dual
+WHERE EXISTS(
+    SELECT * FROM carpooldb.users_and_rooms_infos WHERE
+        EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = 2)
+        AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = 3)
+        AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = 2 AND roomid = 3)
+    LIMIT 1);
+
+SELECT * FROM carpooldb.users_and_rooms_infos;

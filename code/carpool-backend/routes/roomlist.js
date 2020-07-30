@@ -127,7 +127,7 @@ router.put('/', (req, res) => {
 
         // 값 업데이트
         DB((err, connection) => {
-            if(err){
+            if (err) {
                 // TODO : DB에 접근 못 할때
                 console.log("PUT /roomlist error : 서버 이용자가 너무 많습니다.")
             }
@@ -160,7 +160,7 @@ router.delete('/', (req, res) => {
     // 값 삭제
     var deleteQuery = `DELETE FROM carpoolDB.roominfos WHERE id=?`;
     DB((err, connection) => {
-        if(err){
+        if (err) {
             // TODO : DB에 접근 못 할때
             console.log("DELETE /roomlist error : 서버 이용자가 너무 많습니다.")
         }
@@ -191,15 +191,16 @@ router.get('/userid', function (req, res, next) {
     }
 
     // admin이 아닌데 다른 id로 접근하는 경우에는 에러
-    if(req.user.isAdmin == 0 && req.query.id != req.user.id){
-        // TODO : 접근 오류
+    if (req.user.isAdmin == 0 && req.query.id != req.user.id) {
+        // TODO : 접근 권한 오류
         next(new Error('GET /roomlist error:2'));
-    } else{
+    } else {
         // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
         var belongQuery = `SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
-        FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ?;`
+        FROM carpooldb.roominfos INNER JOIN carpooldb.users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ? ORDER BY depart_time ASC;`;
+
         DB((err, connection) => {
-            if(err){
+            if (err) {
                 // TODO : DB에 접근 못 할 때
                 console.log("GET /roomlist/userid?id= error : 서버 이용자가 너무 많습니다.")
             }
@@ -211,13 +212,11 @@ router.get('/userid', function (req, res, next) {
                     }
                     console.log("id에 해당하는 사람이 속해있는 방의 정보 출력", result);
                     res.json(result);
-                    res.status(200).end()
+                    res.status(200).end();
                 })
             }
-    })
+        });
     }
-
-    res.send('GET /roomlist?');
 });
 
 // POST /roomlist/userid
@@ -225,14 +224,42 @@ router.post('/userid', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.user == undefined) {
         next(new Error('POST /roomlist/userid error:0'));
+    } else {
+        // query
+        var addUsersRoomQuery = `INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT ?, ? FROM dual
+                                    WHERE EXISTS(
+                                        SELECT * FROM carpooldb.users_and_rooms_infos WHERE
+                                            EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = ?)
+                                            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
+                                            AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ?)
+                                        LIMIT 1);`;
+        /* var userID = req.body.userID;
+        var roomID = req.body.roomID; */
+        var userID = 1;
+        var roomID = 5;
+        DB((err, connection) => {
+            if (err) {
+                // TODO : DB에 접근 못 할 때
+                console.log("POST /roomlist/userid error : 서버 이용자가 너무 많습니다.")
+            }
+            if (!err) {
+                connection.query(addUsersRoomQuery, [userID, roomID, userID, roomID, userID, roomID], (err, result) => {
+                    if (err) {
+                        // TODO : sql 내부 에러 처리
+                        console.log("POST /roomlist/userid error : SQL 내부 에러. query를 확인해 주세요.");
+                    }
+                    res.json(result);
+                    res.status(200).end();
+                })
+            }
+        });
     }
-    res.send('POST /roomlist/userid');
 });
 // DELETE /roomlist/userid
 router.delete('/userid', (req, res) => {
     // TODO : 로그인 에러
     if (req.user == undefined) {
-        next(new Error('POST /roomlist error:0'));
+        next(new Error('DELETE /roomlist/userid error:0'));
     }
     res.send('DELETE /roomlist/userid');
 });
