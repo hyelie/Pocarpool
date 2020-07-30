@@ -7,7 +7,7 @@ var template = require('../HTML/template').template;
 var router = express.Router();
 const passport = require('passport');
 
-// 일단 간단하게 짠거니까 url은 크게 신경쓰지 마세요, 통합 로그인 구축되면 수정합니다.
+// 일단 간단하게 짠거니까 url 및 보안은 크게 신경쓰지 마세요, 통합 로그인 구축되면 수정합니다.
 // 로그인
 router.get('/login', function (req, res, next) {
     res.send(template.login);
@@ -30,7 +30,7 @@ router.post('/register_process', function (req, res, next) {
     var username = req.body.name;
     var userid = req.body.id;
     var userpw = req.body.pwd;
-
+    var registerDone = false;
     DB((poolerr, connection) => {
         if (!poolerr) {
             console.log("회원가입 정보 확인", username, userid, userpw);
@@ -40,14 +40,19 @@ router.post('/register_process', function (req, res, next) {
                     console.log("이미 존재하는 ID입니다!");
                 } else {
                     console.log("등록 완료~");
+                    registerDone = true;
+                    
                 }
                 connection.release();
             });
         }
     });
-    res.status(200);
-    res.redirect('/');
-    res.end();
+    if(!registerDone){
+        res.redirect('/auth/register');
+    }else{
+        res.redirect('/');
+    }
+    
 });
 
 // 로그아웃

@@ -15,7 +15,7 @@ module.exports = () => {
                 var findByID_query = `SELECT * FROM carpoolDB.users WHERE memberID = (?);`
                 connection.query(findByID_query, [id], (err, result) => {
                     if (err) {
-                        console.log("로그인 인증 - 사용자 정보를  불러올 수 없습니다.");
+                        console.log("사용자 정보를  불러올 수 없습니다.");
                     }
                     // result 중에 id로 검사하는 문
                     console.log("deserializeUser", id, result[0]);
