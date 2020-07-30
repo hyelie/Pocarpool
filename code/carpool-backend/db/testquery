@@ -1,1 +1,25 @@
-INSERT INTO roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(${property},0,4,0,4,0,0,NOW())`;
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+VALUES("택시",'지곡1','포항역1','2020-07-30 07:15:01','2020-07-30 07:15:01',0,1,0,1,0,'2020-07-30 07:15:01');
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+VALUES("택시",'지곡2','포항역2','2020-07-30 07:15:02','2020-07-30 07:15:02',1,2,1,2,0,'2020-07-30 07:15:02');
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+VALUES("택시",'지곡3','포항역3','3030-07-30 07:15:03','3030-07-30 07:15:03',1,3,1,3,0,'3030-07-30 07:15:03');
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+VALUES("택시",'지곡4','포항역4','2040-07-20 07:15:04','2040-07-20 07:15:04',1,4,1,4,0,'2040-07-20 07:15:04');
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+VALUES("택시",'지곡5','포항역5','2020-07-30 07:55:05','2020-07-30 07:55:05',0,5,0,5,0,'2020-07-30 07:55:05');
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+VALUES("택시",'지곡6','포항역6','2020-07-30 07:35:06','2020-07-30 07:35:06',0,6,0,6,0,'2020-07-30 07:35:06');
+
+INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람1", "people1", "people1");
+INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람2", "people2", "people2");
+INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람3", "people3", "people3");
+INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람4", "people4", "people4");
+INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람5", "people5", "people5");
+
+사람 1 : 방 2, 4
+사람 2 : 방 1, 2, 5
+사람 3 : 방 6
+사람 4 : 방 1, 2, 4, 6
+사람 5 : 방 3, 5, 6
+
