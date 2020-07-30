@@ -113,7 +113,7 @@ router.put('/', (req, res) => {
 
     console.log(req.body);
     var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-    var updateData = [req.body.car_type, req.body.depart_place, req.body.arrive_place, req.body.depart_time, req.body.depart_place, req.body.current_headcount, req.body.total_headcount, eq.body.current_carrier_num, req.body.total_carrier_num, req.body.isConfirm, req.body.isConfirm_time];
+    var updateData = [req.body.car_type, req.body.depart_place, req.body.arrive_place, req.body.depart_time, req.body.arrive_place, req.body.current_headcount, req.body.total_headcount, eq.body.current_carrier_num, req.body.total_carrier_num, req.body.isConfirm, req.body.isConfirm_time];
 
     // PUT /roomlist 입력 값 에러 : 2
     if (updateQueryArray.every(undefined) || !regExp.test(updateData[3]) || !regExp.test(updateData[4])) {
