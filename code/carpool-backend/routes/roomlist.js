@@ -23,11 +23,18 @@ router.get('/', function (req, res, next) {
     // 3. 사용자에게 json 형식으로 출력하기
 
     // 1. MySql query문 만들기
+    var element = []
     var property = ``
-    property = property + ((req.query.depart_place != undefined) ? `depart_place='${req.query.depart_place}'` : ``)
-    property = property + ((property != `` && req.query.arrive_place != undefined) ? ` AND ` : ``) + ((req.query.arrive_place != undefined) ? `arrive_place='${req.query.arrive_place}'` : ``)
-    property = property + ((property != `` && req.query.depart_time != undefined) ? ` AND ` : ``) + ((req.query.depart_time != undefined) ? `depart_time='${req.query.depart_time}'` : ``)
-    property = property + ((property != `` && req.query.arrive_time != undefined) ? ` AND ` : ``) + ((req.query.arrive_time != undefined) ? `arrive_time='${req.query.arrive_time}'` : ``)
+    property = property + ((req.query.depart_place != undefined) ? `depart_place=?` : ``)
+    if (req.query.depart_place != undefined){ element.push(depart_place)}
+    property = property + ((property != `` && req.query.arrive_place != undefined) ? ` AND ` : ``) + ((req.query.arrive_place != undefined) ? `arrive_place=?` : ``)
+    if (req.query.depart_place != undefined){ element.push(arrive_place)}
+    property = property + ((property != `` && req.query.depart_time != undefined) ? ` AND ` : ``) + ((req.query.depart_time != undefined) ? `depart_time=?` : ``)
+    if (req.query.depart_place != undefined){ element.push(depart_time)}
+    property = property + ((property != `` && req.query.arrive_time != undefined) ? ` AND ` : ``) + ((req.query.arrive_time != undefined) ? `arrive_time=?` : ``)
+    if (req.query.depart_place != undefined){ element.push(arrive_time)}
+    
+
     // 쿼리 완성
     if (property == ``) {
         var sql = `SELECT * FROM carpooldb.roominfos`
@@ -39,7 +46,7 @@ router.get('/', function (req, res, next) {
     // 2. DB.query로 보내서 출력 가져오기
     DB((err, connection) => {
         if (!err) {
-            connection.query(sql, (err, rows, fields) => {
+            connection.query(sql,element, (err, rows, fields) => {
                 if (err) throw err;
                 console.log(rows)
                 connection.release();
@@ -75,21 +82,21 @@ router.post('/', (req, res, next) => {
     }
     else {
         // 1. MySql query문 만들기
-        var property = `'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'`
-        //var property = `'자가용','지곡회관','공학동',NOW(),NOW()` //시간: 2020-07-29 14:10:23 형태를 한다
-        var sql = `INSERT INTO roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, userId, isConfirm, confirm_time) VALUES(${property},0,4,0,4,0,0,NOW())`;
+        //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
+        //시간: 2020-07-29 14:10:23 형태를 한다
+        var sql = `INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,0,0,0,0,0,NOW())`;
 
         // 2. DB.query로 보내서 출력 가져오기
         DB((err1, connection) => {
             if (!err1) {
-                connection.query(sql, (err2, rows, fields) => {
-                    if (err2) throw err;
+                connection.query(sql,[car_type,depart_place,arrive_place,depart_time,arrive_time], (err2, rows, fields) => {
+                    if (err2) throw err2;
                     connection.release();
                 })
             }
         })
         res.status(200)
-        res.redirect('/')
+        //res.redirect('/')
         res.end()
     }
 });
