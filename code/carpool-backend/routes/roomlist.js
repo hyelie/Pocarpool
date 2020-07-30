@@ -127,11 +127,15 @@ router.put('/', (req, res) => {
 
         // 값 업데이트
         DB((err, connection) => {
+            if(err){
+                // TODO : DB에 접근 못 할때
+                console.log("PUT /roomlist error : 서버 이용자가 너무 많습니다.")
+            }
             if (!err) {
                 connection.query(updateQuery, notNULLcolumn, (sqlErr) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
-                        console.log("SQL 내부 에러. query를 확인해 주세요.");
+                        console.log("PUT /roomlist error : SQL 내부 에러. query를 확인해 주세요.");
                     } else {
                         console.log("업데이트 완료");
                     }
@@ -156,11 +160,15 @@ router.delete('/', (req, res) => {
     // 값 삭제
     var deleteQuery = `DELETE FROM carpoolDB.roominfos WHERE id=?`;
     DB((err, connection) => {
+        if(err){
+            // TODO : DB에 접근 못 할때
+            console.log("DELETE /roomlist error : 서버 이용자가 너무 많습니다.")
+        }
         if (!err) {
             connection.query(deleteQuery, [req.body.id], (sqlErr) => {
                 if (sqlErr) {
                     // TODO : sql 내부 에러 처리
-                    console.log("SQL 내부 에러. query를 확인해 주세요. 해당하는 방이 없습니다.");
+                    console.log("DELETE /roomlist error : SQL 내부 에러. query를 확인해 주세요. 해당하는 방이 없습니다.");
                 } else {
                     console.log("삭제 완료");
                 }
@@ -187,9 +195,26 @@ router.get('/userid', function (req, res, next) {
         // TODO : 접근 오류
         next(new Error('GET /roomlist error:2'));
     } else{
-        // SELECT * FROM roominfos LEFT JOIN roomuserinfos ON roominfos.id = roomuserinfos.id WHERE roomuserinfos.userid = ?
-        // userid가 속한 방에 대한 정보 출력
-       //  var belongQuery = `SELECT * FROM carpoolDB.`
+        // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
+        var belongQuery = `SELECT car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
+        FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ?;`
+        DB((err, connection) => {
+            if(err){
+                // TODO : DB에 접근 못 할 때
+                console.log("GET /roomlist/userid?id= error : 서버 이용자가 너무 많습니다.")
+            }
+            if (!err) {
+                connection.query(belongQuery, [req.query.id], (err, result) => {
+                    if (err) {
+                        // TODO : sql 내부 에러 처리
+                        console.log("GET /roomlist/userid?id= error : SQL 내부 에러. query를 확인해 주세요.");
+                    }
+                    console.log("id에 해당하는 사람이 속해있는 방의 정보 출력", result);
+                    res.json(result);
+                    res.status(200).end()
+                })
+            }
+    })
     }
 
     res.send('GET /roomlist?');
