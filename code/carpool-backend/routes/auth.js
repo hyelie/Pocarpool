@@ -17,7 +17,7 @@ router.get('/login', function (req, res, next) {
 router.post('/login_process', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/auth/login'
-}));
+  }));
 
 // 회원가입
 router.get('/register', function (req, res, next) {
