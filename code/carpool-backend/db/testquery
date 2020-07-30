@@ -1,0 +1,1 @@
+INSERT INTO roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(${property},0,4,0,4,0,0,NOW())`;

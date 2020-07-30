@@ -63,7 +63,6 @@ var initQuery = {
     total_headcount       INT(2)      NOT NULL,
     curreunt_carrier_num  INT(2)      NOT NULL,
     total_carrier_num     INT(2)      NOT NULL,
-    userId                INT(11)     NOT NULL,
     isConfirm             BOOL        NOT NULL,
     confirm_time          DATETIME    NOT NULL,
     PRIMARY KEY(id)
