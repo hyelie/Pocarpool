@@ -1,4 +1,4 @@
-/* DB 예제 입력 */
+/* /roomlist DB 예제 입력 */
 INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡1','포항역1','2020-07-30 07:15:01','2020-07-30 07:15:01',0,1,0,1,0,'2020-07-30 07:15:01');
 INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
@@ -55,12 +55,63 @@ FROM carpooldb.roominfos INNER JOIN carpooldb.users_and_rooms_infos ON roominfos
 아래는 user가 없거나, room이 없거나, 이미 있는 값이면 빈 DB를 리턴하고,
 user가 있고, room이 있고, 없는 값일 때만 값 있는 DB를 리턴.
 
-INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT 2, 3 FROM dual
+INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT ?, ? FROM dual
 WHERE EXISTS(
     SELECT * FROM carpooldb.users_and_rooms_infos WHERE
-        EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = 2)
-        AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = 3)
-        AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = 2 AND roomid = 3)
+        EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = ?)
+        AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
+        AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ?)
     LIMIT 1);
 
 SELECT * FROM carpooldb.users_and_rooms_infos;
+
+
+/* report DB 예제 */
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 3, 2, "신고1", '2020-07-31 01:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 4, 2, "신고2", '2020-07-31 02:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 5, 2, "신고3", '2020-07-31 03:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 1, 2, "신고4", '2020-07-31 04:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 2, 2, "신고5", '2020-07-31 05:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 3, 2, "신고6", '2020-07-31 06:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 3, 2, "신고7", '2020-07-31 07:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 1, 2, "신고8", '2020-07-31 08:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 2, 2, "신고9", '2020-07-31 09:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 5, 2, "신고10", '2020-07-31 10:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 4, 2, "신고11", '2020-07-31 11:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 5, 2, "신고12", '2020-07-31 12:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 5, 2, "신고13", '2020-07-31 13:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 1, 2, "신고14", '2020-07-31 14:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 2, 2, "신고15", '2020-07-31 15:01:01');
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(1, 1, 2, "신고16", '2020-07-31 16:01:01');
+
+user 1이 room 2에서 user 3 신고
+SELECT * FROM carpooldb.reports ORDER BY reportTime asc LIMIT n, m;
+처럼 하면 n번째부터 m개의 값을 빨리 신고된 순서대로 출력해 준다.
+
+ * GET /report?page=
+SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime
+FROM carpooldb.reports INNER JOIN carpooldb.users ON reports.accuseUserID = users.id
+ORDER BY reportTime asc LIMIT 0, 20;
+
+ * GET /report?id=
+SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime, chatlogs.chat_content
+FROM carpooldb.reports
+    INNER JOIN carpooldb.users ON reports.accuseUserID = users.id
+    INNER JOIN carpooldb.chatlogs ON chatlogs.reportID = reports.id
+    WHERE reports.id = ?;
+
+ * PUT /report?id=
+UPDATE carpooldb.reports SET isWorkDone = 1 WHERE id = ?;
+
+ * DELETE /report?id=
+DELETE FROM carpoolDB.reports WHERE id=3; DELETE FROM carpoolDB.chatlogs WHERE reportID=3;
+
+
+/* 제일 최근 삽입된 값을 받아오는 query */
+SELECT AUTO_INCREMENT FROM information_schema.tables
+WHERE table_name = 'reports' AND table_schema = 'carpooldb';
+
+ * POST /report
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(?, ?, ?, ?, ?);
+
+

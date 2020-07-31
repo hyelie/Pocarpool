@@ -73,17 +73,17 @@ var initQuery = {
     PRIMARY KEY(id)
   );  CREATE TABLE IF NOT EXISTS chatlogs(
     id                INT(11)     NOT NULL AUTO_INCREMENT,
-    roomId            INT(11)     NOT NULL,
-    userId            INT(11)     NOT NULL,
-    chat_send_time    DATETIME    NOT NULL,
+    reportID          INT(11)     NOT NULL,
     chat_content      TEXT        NOT NULL,
-    isWorkDone        BOOL        NOT NULL DEFAULT false,
     PRIMARY KEY(id)
   );  CREATE TABLE IF NOT EXISTS reports(
     id                INT(11)     NOT NULL AUTO_INCREMENT,
-    reportId          INT(11)     NOT NULL,
-    accusedId         INT(11)     NOT NULL,
+    reportUserId      INT(11)     NOT NULL,
+    accuseUserId      INT(11)     NOT NULL,
     roomId            INT(11)     NOT NULL,
+    reportReason      TEXT        NOT NULL,
+    isWorkDone        BOOL        NOT NULL DEFAULT false,
+    reportTime        DATETIME    NOT NULL,
     PRIMARY KEY(id)
   );`,
   chatlog_rearrange : `ALTER TABLE chatlogs AUTO_INCREMENT=1; SET @COUNT=0; UPDATE chatlogs SET id = @COUNT:=@COUNT+1;`
