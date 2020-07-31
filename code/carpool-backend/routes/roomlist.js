@@ -9,53 +9,56 @@ var DB = require('../db/initiate').connection;
 router.get('/', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.user == undefined) {
+        console.log("login error")
         next(new Error('GET /roomlist error:0'));
     }
-    /* query의 데이터들은 아래의 형식으로 들어오는 것을 확인할 수 있다.
-    console.log(req.query.depart_place)
-    console.log(req.query.arrive_place)
-    console.log(req.query.depart_time)
-    console.log(req.query.arrive_time)
-    */
+    else{
+        /* query의 데이터들은 아래의 형식으로 들어오는 것을 확인할 수 있다.
+        console.log(req.query.depart_place)
+        console.log(req.query.arrive_place)
+        console.log(req.query.depart_time)
+        console.log(req.query.arrive_time)
+        */
 
-    // 1. MySql query문 만들기
-    // 2. DB.query로 보내서 출력 가져오기
-    // 3. 사용자에게 json 형식으로 출력하기
+        // 1. MySql query문 만들기
+        // 2. DB.query로 보내서 출력 가져오기
+        // 3. 사용자에게 json 형식으로 출력하기
 
-    // 1. MySql query문 만들기
-    var element = []
-    var property = ``
-    property = property + ((req.query.depart_place != undefined) ? `depart_place=?` : ``)
-    if (req.query.depart_place != undefined){ element.push(depart_place)}
-    property = property + ((property != `` && req.query.arrive_place != undefined) ? ` AND ` : ``) + ((req.query.arrive_place != undefined) ? `arrive_place=?` : ``)
-    if (req.query.depart_place != undefined){ element.push(arrive_place)}
-    property = property + ((property != `` && req.query.depart_time != undefined) ? ` AND ` : ``) + ((req.query.depart_time != undefined) ? `depart_time=?` : ``)
-    if (req.query.depart_place != undefined){ element.push(depart_time)}
-    property = property + ((property != `` && req.query.arrive_time != undefined) ? ` AND ` : ``) + ((req.query.arrive_time != undefined) ? `arrive_time=?` : ``)
-    if (req.query.depart_place != undefined){ element.push(arrive_time)}
-    
+        // 1. MySql query문 만들기
+        var element = []
+        var property = ``
+        property = property + ((req.query.depart_place != undefined) ? `depart_place=?` : ``)
+        if (req.query.depart_place != undefined){ element.push(depart_place)}
+        property = property + ((property != `` && req.query.arrive_place != undefined) ? ` AND ` : ``) + ((req.query.arrive_place != undefined) ? `arrive_place=?` : ``)
+        if (req.query.depart_place != undefined){ element.push(arrive_place)}
+        property = property + ((property != `` && req.query.depart_time != undefined) ? ` AND ` : ``) + ((req.query.depart_time != undefined) ? `depart_time=?` : ``)
+        if (req.query.depart_place != undefined){ element.push(depart_time)}
+        property = property + ((property != `` && req.query.arrive_time != undefined) ? ` AND ` : ``) + ((req.query.arrive_time != undefined) ? `arrive_time=?` : ``)
+        if (req.query.depart_place != undefined){ element.push(arrive_time)}
+        
 
-    // 쿼리 완성
-    if (property == ``) {
-        var sql = `SELECT * FROM carpooldb.roominfos`
-    }
-    else {
-        var sql = `SELECT * FROM carpooldb.roominfos WHERE ${property}`
-    }
-
-    // 2. DB.query로 보내서 출력 가져오기
-    DB((err, connection) => {
-        if (!err) {
-            connection.query(sql,element, (err, rows, fields) => {
-                if (err) throw err;
-                console.log(rows)
-                
-                res.json(rows) // 3. 사용자에게 json 형식으로 출력하기
-                res.status(200).end()
-            })
+        // 쿼리 완성
+        if (property == ``) {
+            var sql = `SELECT * FROM carpooldb.roominfos`
         }
-        connection.release();
-    })
+        else {
+            var sql = `SELECT * FROM carpooldb.roominfos WHERE ${property}`
+        }
+
+        // 2. DB.query로 보내서 출력 가져오기
+        DB((err, connection) => {
+            if (!err) {
+                connection.query(sql,element, (err, rows, fields) => {
+                    if (err) throw err;
+                    console.log(rows)
+                    
+                    res.json(rows) // 3. 사용자에게 json 형식으로 출력하기
+                    res.status(200).end()
+                })
+            }
+            connection.release();
+        })
+    }
 });
 
 // POST /roomlist
@@ -65,40 +68,41 @@ router.post('/', (req, res, next) => {
     if (req.user == undefined) {
         next(new Error('POST /roomlist error:0'));
     }
+    else{
+        console.log(req.body)
+        car_type = req.body.car_type
+        depart_place = req.body.depart_place
+        arrive_place = req.body.arrive_place
+        depart_time = req.body.depart_time
+        arrive_time = req.body.arrive_time
 
-    console.log(req.body)
-    car_type = req.body.car_type
-    depart_place = req.body.depart_place
-    arrive_place = req.body.arrive_place
-    depart_time = req.body.depart_time
-    arrive_time = req.body.arrive_time
+        // 시간 검사용 정규표현식
+        var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
-    // 시간 검사용 정규표현식
-    var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+        // 오류처리
+        if ((car_type != "자가용" && car_type != "택시") || depart_place == undefined || arrive_place == undefined || !regExp.test(depart_time) || !regExp.test(arrive_time)) {
+            next(new Error('POST /roomlist error:1'));
+        }
+        else {
+            // 1. MySql query문 만들기
+            //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
+            //시간: 2020-07-29 14:10:23 형태를 한다
+            var sql = `INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,0,0,0,0,0,NOW())`;
 
-    // 오류처리
-    if ((car_type != "자가용" && car_type != "택시") || depart_place == undefined || arrive_place == undefined || !regExp.test(depart_time) || !regExp.test(arrive_time)) {
-        next(new Error('POST /roomlist error:1'));
-    }
-    else {
-        // 1. MySql query문 만들기
-        //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
-        //시간: 2020-07-29 14:10:23 형태를 한다
-        var sql = `INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,0,0,0,0,0,NOW())`;
-
-        // 2. DB.query로 보내서 출력 가져오기
-        DB((err1, connection) => {
-            if (!err1) {
-                connection.query(sql,[car_type,depart_place,arrive_place,depart_time,arrive_time], (err2, rows, fields) => {
-                    if (err2) throw err2;
-                    
-                })
-            }
-        })
-        connection.release();
-        res.status(200)
-        //res.redirect('/')
-        res.end()
+            // 2. DB.query로 보내서 출력 가져오기
+            DB((err1, connection) => {
+                if (!err1) {
+                    connection.query(sql,[car_type,depart_place,arrive_place,depart_time,arrive_time], (err2, rows, fields) => {
+                        if (err2) throw err2;
+                        
+                    })
+                }
+            })
+            connection.release();
+            res.status(200)
+            res.redirect('/')
+            res.end()
+        }
     }
 });
 
