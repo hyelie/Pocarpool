@@ -13,15 +13,43 @@ router.post('/', function (req, res, next) {
         // TODO : 접근 권한 오류
         next(new Error('POST /report error:2'));
     } else {
-        var reportUserID = req.body.reportUserID;
-        var accuseUserID = req.body.accuseUserID;
-        var roomID = req.body.roomID;
-        var reportReason = req.body.reportReason;
         var reportTime = req.body.reportTime;
-
         var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
         if (!regExp.test(reportTime)) {
             next(new Error('POST /report error:1'));
+        } else{
+            var createReportQuery = `INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT ?, ?, ?, ?, ? FROM dual
+                                        WHERE EXISTS(
+                                            SELECT * FROM carpoolDB.reports WHERE
+                                                EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+                                                AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+                                                AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
+                                        );
+                                    INSERT INTO carpooldb.chatlogs (reportID, chat_content) SELECT LAST_INSERT_ID(), ? FROM dual
+                                        WHERE EXISTS(
+                                            SELECT * FROM carpoolDB.reports WHERE
+                                                EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+                                                AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+                                                AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
+                                        );`
+            var QueryVariable = [req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.reportReason, reportTime, req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.chatlogs, req.body.reportUserID, req.body.accuseUserID, req.body.roomID,];
+            DB((err, connection) => {
+                if (err) {
+                    // TODO : DB에 접근 못 할때
+                    console.log("POST /report?id= error : 서버 이용자가 너무 많습니다.");
+                    next(new Error('POST /report?id= error:3'));
+                } else {
+                    connection.query(createReportQuery, [QueryVariable], (sqlErr) => {
+                        if (sqlErr) {
+                            // TODO : sql 내부 에러 처리
+                            console.log("POST /report error : SQL 내부 에러. query를 확인해 주세요.");
+                        } else {
+                            res.status(200).end();
+                        }
+                    })
+                }
+                connection.release();
+            });
         }
     }
 });
@@ -79,10 +107,10 @@ router.put('/', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.user == undefined) {
         console.log("login error")
-        next(new Error('DELETE /report error:0'));
+        next(new Error('PUT /report error:0'));
     } else if (req.user.isAdmin == 0) {
         // TODO : 접근 권한 오류
-        next(new Error('DELETE /report error:2'));
+        next(new Error('PUT /report error:2'));
     } else {
         // reportid에 해당하는 신고 세부 내용(채팅)
         var ReportUpdateQuery = `UPDATE carpooldb.reports SET isWorkDone = 1 WHERE id = ?;`
@@ -95,7 +123,7 @@ router.put('/', function (req, res, next) {
                 connection.query(ReportUpdateQuery, [req.query.id], (sqlErr) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
-                        console.log("GET /report error : SQL 내부 에러. query를 확인해 주세요.");
+                        console.log("PUT /report error : SQL 내부 에러. query를 확인해 주세요.");
                     } else {
                         res.status(200).end();
                     }

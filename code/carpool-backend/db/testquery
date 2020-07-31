@@ -91,7 +91,7 @@ SELECT * FROM carpooldb.reports ORDER BY reportTime asc LIMIT n, m;
  * GET /report?page=
 SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime
 FROM carpooldb.reports INNER JOIN carpooldb.users ON reports.accuseUserID = users.id
-ORDER BY reportTime asc LIMIT 0, 20;
+ORDER BY reportTime asc LIMIT ?, 20;
 
  * GET /report?id=
 SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime, chatlogs.chat_content
@@ -108,10 +108,28 @@ DELETE FROM carpoolDB.reports WHERE id=3; DELETE FROM carpoolDB.chatlogs WHERE r
 
 
 /* 제일 최근 삽입된 값을 받아오는 query */
-SELECT AUTO_INCREMENT FROM information_schema.tables
-WHERE table_name = 'reports' AND table_schema = 'carpooldb';
+SELECT LAST_INSERT_ID()
 
  * POST /report
+기본형은 아래와 같다.
 INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) VALUES(?, ?, ?, ?, ?);
+INSERT INTO carpooldb.chatlogs (reportID, chat_content) VALUES(SELECT LAST_INSERT_ID(), ?);
 
+user와 room이 없을 때는 DB에 들어가면 안된다.
+1. user가 존재하지 않는 경우 or 2. room이 존재하지 않는 경우에는 삽입하면 안 된다.
+즉 user가 있고, room이 있을 때만 삽입
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT ?, ?, ?, ?, ? FROM dual
+    WHERE EXISTS(
+        SELECT * FROM carpoolDB.reports WHERE
+            EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+            AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
+    );
+INSERT INTO carpooldb.chatlogs (reportID, chat_content) SELECT LAST_INSERT_ID(), ? FROM dual
+    WHERE EXISTS(
+        SELECT * FROM carpoolDB.reports WHERE
+            EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+            AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
+            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
+    );
 

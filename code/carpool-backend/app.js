@@ -25,6 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json({limit : '128kb'}));
 
 
 // 간단한 기능이기 때문에 대충 설정했음, passport 활성화
