@@ -258,12 +258,9 @@ router.post('/userid', function (req, res, next) {
     } else {
         // query
         var addUsersRoomQuery = `INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT ?, ? FROM dual
-                                    WHERE EXISTS(
-                                        SELECT * FROM carpooldb.users_and_rooms_infos WHERE
-                                            EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = ?)
-                                            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
-                                            AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ?)
-                                        LIMIT 1);`;
+                                    WHERE EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = ? LIMIT 1)
+                                            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ? LIMIT 1)
+                                            AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ? LIMIT 1);`;
         var userID = req.body.userID;
         var roomID = req.body.roomID;
         pool.getConnection(function (err, connection) {
