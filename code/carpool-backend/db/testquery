@@ -1,15 +1,15 @@
 /* /roomlist DB 예제 입력 */
-INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡1','포항역1','2020-07-30 07:15:01','2020-07-30 07:15:01',0,1,0,1,0,'2020-07-30 07:15:01');
-INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡2','포항역2','2020-07-30 07:15:02','2020-07-30 07:15:02',1,2,1,2,0,'2020-07-30 07:15:02');
-INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡3','포항역3','3030-07-30 07:15:03','3030-07-30 07:15:03',1,3,1,3,0,'3030-07-30 07:15:03');
-INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡4','포항역4','2040-07-20 07:15:04','2040-07-20 07:15:04',1,4,1,4,0,'2040-07-20 07:15:04');
-INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡5','포항역5','2020-07-30 07:55:05','2020-07-30 07:55:05',0,5,0,5,0,'2020-07-30 07:55:05');
-INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time)
+INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time)
 VALUES("택시",'지곡6','포항역6','2020-07-30 07:35:06','2020-07-30 07:35:06',0,6,0,6,0,'2020-07-30 07:35:06');
 
 INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람1", "people1", "people1");
@@ -17,6 +17,7 @@ INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람2", "people
 INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람3", "people3", "people3");
 INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람4", "people4", "people4");
 INSERT INTO carpooldb.users (name, memberID, memberPW) VALUES("사람5", "people5", "people5");
+INSERT INTO carpooldb.users (name, memberID, memberPW, isAdmin) VALUES("admin", "poapper", "poapper", 1);
 
 INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(1, 2);
 INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) VALUES(1, 4);
@@ -36,6 +37,8 @@ USE carpoolDB;
 SELECT * FROM users;
 SELECT * FROM roominfos;
 SELECT * FROM users_and_rooms_infos;
+SELECT * FROM chatlogs;
+SELECT * FROM reports;
 
 임의대로 지곡n의 n을 방 번호 사람n의 n을 사람 번호라고 매겼다.
 사람 1 : 방 2, 4
@@ -48,7 +51,7 @@ SELECT * FROM roominfos INNER JOIN users_and_rooms_infos ON roominfos.id = users
 userid = ?에 해당하는 사람이 속한 방의 정보를 얻어온다.
 
 사용하면 되는 query
-SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, curreunt_carrier_num, total_carrier_num, isConfirm, confirm_time
+SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time
 FROM carpooldb.roominfos INNER JOIN carpooldb.users_and_rooms_infos ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ? ORDER BY depart_time ASC;
 
 /* 특정 table에서 값이 있는지 없는지를 검사한 후 삽입 */
@@ -123,18 +126,29 @@ INSERT INTO carpooldb.chatlogs (reportID, chat_content) VALUES(SELECT LAST_INSER
 user와 room이 없을 때는 DB에 들어가면 안된다.
 1. user가 존재하지 않는 경우 or 2. room이 존재하지 않는 경우에는 삽입하면 안 된다.
 즉 user가 있고, room이 있을 때만 삽입
-INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT ?, ?, ?, ?, ? FROM dual
-    WHERE EXISTS(
-        SELECT * FROM carpoolDB.reports WHERE
-            EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-            AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
-    );
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT ?, ?, ?, ?, ? FROM dual WHERE
+    NOT EXISTS (SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=? AND reports.accuseUserID=?)
+    AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ? LIMIT 1)
+    AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ? LIMIT 1)
+    AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ? LIMIT 1);
 INSERT INTO carpooldb.chatlogs (reportID, chat_content) SELECT LAST_INSERT_ID(), ? FROM dual
-    WHERE EXISTS(
-        SELECT * FROM carpoolDB.reports WHERE
-            EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-            AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
-    );
+    WHERE EXISTS(SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=? AND reports.accuseUserID=? AND reports.roomID = ? LIMIT 1);
 
+
+
+
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT 2, 3, 5, "사유1", "1999-10-12 12:12:12" FROM dual WHERE
+    NOT EXISTS(SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=3 AND reports.accuseUserID=2)
+    AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = 2 LIMIT 1)
+    AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = 3 LIMIT 1)
+    AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = 5 LIMIT 1);
+INSERT INTO carpooldb.chatlogs (reportID, chat_content) SELECT LAST_INSERT_ID(), "신고1" FROM dual
+    WHERE EXISTS(SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=2 AND reports.accuseUserID=3 LIMIT 1);
+
+INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT 1, 2, 5, "사유1", "1999-10-12 12:12:12" FROM dual WHERE
+                                        NOT EXISTS (SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=1 AND reports.accuseUserID=2)
+                                        AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = 1 LIMIT 1)
+                                        AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = 2 LIMIT 1)
+                                        AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = 5 LIMIT 1);
+                                    INSERT INTO carpooldb.chatlogs (reportID, chat_content) SELECT LAST_INSERT_ID(), "채팅1" FROM dual
+                                        WHERE EXISTS(SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=1 AND reports.accuseUserID=2 AND reports.roomID=5 LIMIT 1); 

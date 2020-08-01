@@ -2,7 +2,6 @@ const express = require('express');
 const { connect } = require('./auth');
 const { PayloadTooLarge } = require('http-errors');
 const router = express.Router();
-var DB = require('../db/initiate').connection;
 var pool = require('../db/initiate').pool;
 // 미구현된 부분은 TODO : task의 형식으로 달았다.
 
@@ -170,9 +169,9 @@ router.put('/', (req, res, next) => {
     }
 });
 
-// DELETE /roomlist
+// DELETE /roomlist?roomID=
 // pass
-router.delete('/:roomID', (req, res, next) => {
+router.delete('/', (req, res, next) => {
     // TODO : 로그인 에러
     if (req.user == undefined) {
         next(new Error('DELETE /roomlist error:0'));
@@ -187,7 +186,7 @@ router.delete('/:roomID', (req, res, next) => {
                 console.log("DELETE /roomlist error : 서버 이용자가 너무 많습니다.");
                 next(new Error('DELETE /roomlist error:3'));
             } else {
-                connection.query(deleteQuery, [req.params.roomID, req.params.roomID], (sqlErr) => {
+                connection.query(deleteQuery, [req.query.roomID, req.query.roomID], (sqlErr) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("DELETE /roomlist error : SQL 내부 에러. query를 확인해 주세요. 해당하는 방이 없습니다.");
@@ -207,15 +206,15 @@ router.delete('/:roomID', (req, res, next) => {
     }
 });
 
-// GET /roomlist/userid/:userID
+// GET /roomlist/userid?userID=
 // pass
-router.get('/userid/:userID', function (req, res, next) {
+router.get('/userid', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.user == undefined) {
         next(new Error('GET /roomlist error:0'));
     } else {
         // admin이 아닌데 다른 id로 접근하는 경우에는 에러
-        if (req.user.isAdmin == 0 && req.params.userID != req.user.id) {
+        if (req.user.isAdmin == 0 && req.query.userID != req.user.id) {
             // TODO : 접근 권한 오류
             next(new Error('GET /roomlist error:2'));
         } else {
@@ -231,7 +230,7 @@ router.get('/userid/:userID', function (req, res, next) {
                     connection.release();
                     next(new Error('GET /roomlist error:3'));
                 } else {
-                    connection.query(belongQuery, [req.params.userID], (err, result) => {
+                    connection.query(belongQuery, [req.query.userID], (err, result) => {
                         console.log(belongQuery);
                         if (err) {
                             // TODO : sql 내부 에러 처리

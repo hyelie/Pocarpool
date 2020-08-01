@@ -1,6 +1,7 @@
 const express = require('express');
-const router = express.Router();
+const { route } = require('.');
 var pool = require('../db/initiate').pool;
+const router = express.Router();
 // 미구현된 부분은 TODO : task의 형식으로 달았다.
 
 // POST /report
@@ -18,28 +19,22 @@ router.post('/', function (req, res, next) {
         if (!regExp.test(reportTime)) {
             next(new Error('POST /report error:1'));
         } else{
-            var createReportQuery = `INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT ?, ?, ?, ?, ? FROM dual
-                                        WHERE EXISTS(
-                                            SELECT * FROM carpoolDB.reports WHERE
-                                                EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-                                                AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-                                                AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
-                                        );
+            var createReportQuery = `INSERT INTO carpooldb.reports (reportUserID, accuseUserID, roomID, reportReason, reportTime) SELECT ?, ?, ?, ?, ? FROM dual WHERE
+                                        NOT EXISTS (SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=? AND reports.accuseUserID=?)
+                                        AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ? LIMIT 1)
+                                        AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ? LIMIT 1)
+                                        AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ? LIMIT 1);
                                     INSERT INTO carpooldb.chatlogs (reportID, chat_content) SELECT LAST_INSERT_ID(), ? FROM dual
-                                        WHERE EXISTS(
-                                            SELECT * FROM carpoolDB.reports WHERE
-                                                EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-                                                AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ?)
-                                                AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
-                                        );`
-            var QueryVariable = [req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.reportReason, reportTime, req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.chatlogs, req.body.reportUserID, req.body.accuseUserID, req.body.roomID,];
+                                        WHERE EXISTS(SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=? AND reports.accuseUserID=? AND reports.roomID = ? LIMIT 1);`
+            var QueryVariable = [req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.reportReason, reportTime, req.body.reportUserID, req.body.accuseUserID, req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.chatlogs, req.body.reportUserID, req.body.accuseUserID, req.body.roomID];
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할때
                     console.log("POST /report?id= error : 서버 이용자가 너무 많습니다.");
                     next(new Error('POST /report?id= error:3'));
                 } else {
-                    connection.query(createReportQuery, [QueryVariable], (sqlErr) => {
+                    console.log(createReportQuery, QueryVariable);
+                    connection.query(createReportQuery, QueryVariable, (sqlErr, result) => {
                         if (sqlErr) {
                             // TODO : sql 내부 에러 처리
                             console.log("POST /report error : SQL 내부 에러. query를 확인해 주세요.");
@@ -72,18 +67,18 @@ router.get('/', function (req, res, next) {
         var getQuery, variable;
         if(req.query.id == undefined){
             // 목록 출력
-            var getQuery = `SELECT reports.id, reports.roomID, reports.reportID, reports.accuseID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime
-                            FROM carpooldb.reports INNER JOIN carpooldb.users ON reports.accuseID = users.id
+            getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime
+                            FROM carpooldb.reports INNER JOIN carpooldb.users ON reports.accuseUserID = users.id
                             ORDER BY reportTime asc LIMIT ?, 20;`;
-            var variable = (req.query.page-1) * 20;
+            variable = (req.query.page-1) * 20;
         } else{
-            // reportid에 해당하는 신고 세부 내용(채팅)
-            var getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime, chatlogs.chat_content
+            // reportUserID에 해당하는 신고 세부 내용(채팅)
+            getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime, chatlogs.chat_content
                             FROM carpooldb.reports
                                 INNER JOIN carpooldb.users ON reports.accuseUserID = users.id
                                 INNER JOIN carpooldb.chatlogs ON chatlogs.reportID = reports.id
                                 WHERE reports.id = ?;`
-            var variable = req.query.id;
+            variable = req.query.id;
         }
         pool.getConnection(function (err, connection) {
             if (err) {
@@ -91,7 +86,8 @@ router.get('/', function (req, res, next) {
                 console.log("GET /report error : 서버 이용자가 너무 많습니다.");
                 next(new Error('GET /report error:3'));
             } else {
-                connection.query(getQuery, [variable], (sqlErr) => {
+                console.log(getQuery, variable);
+                connection.query(getQuery, [variable], (sqlErr, result) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("GET /report error : SQL 내부 에러. query를 확인해 주세요.");
@@ -106,7 +102,6 @@ router.get('/', function (req, res, next) {
             connection.release();
             console.log(pool._freeConnections.indexOf(connection));
         });
-        res.end();
     }
 });
 
@@ -128,7 +123,7 @@ router.put('/', function (req, res, next) {
                 console.log("PUT /report?id= error : 서버 이용자가 너무 많습니다.");
                 next(new Error('PUT /report?id= error:3'));
             } else {
-                connection.query(ReportUpdateQuery, [req.query.id], (sqlErr) => {
+                connection.query(ReportUpdateQuery, [req.query.id], (sqlErr, result) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("PUT /report error : SQL 내부 에러. query를 확인해 주세요.");
@@ -163,7 +158,7 @@ router.delete('/', function (req, res, next) {
                 console.log("DELETE /report?id= error : 서버 이용자가 너무 많습니다.");
                 next(new Error('DELETE /report?id= error:3'));
             } else {
-                connection.query(ReportDeleteQuery, [req.query.id], (sqlErr) => {
+                connection.query(ReportDeleteQuery, [req.query.id, req.query.id], (sqlErr, result) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("DELETE /report error : SQL 내부 에러. query를 확인해 주세요.");
