@@ -1,6 +1,6 @@
 var mysql = require('mysql');
 const { connect } = require('../app');
-const pool = mysql.createPool({
+exports.pool = mysql.createPool({
   host : 'localhost',
   user : 'poapper',
   password : 'poapper',
@@ -9,53 +9,42 @@ const pool = mysql.createPool({
   connectionLimit : 50
 });
 
-exports.pool = mysql.createPool({
-  host : 'localhost',
-  user : 'poapper',
-  password : 'poapper',
-  multipleStatements : true,
-  waitForConnections : true,
-  connectionLimit : 5
-});
-
-exports.connection = function(callback){
-  pool.getConnection(function(err, connection){
-    if(!err){
-        callback(err, connection);
-    }
-  });
-}
-
 exports.checkQuery = {
   checkDBs : `SHOW DATABASES;`,
   checkTables : `USE carpoolDB; SHOW TABLES;`,
 }
 
 exports.exeQuery = {
-  initMysql : function(DB){
+  initMysql: function (pool) {
     console.log("pool에서 Schema 여부를 확인 후 carpoolDB 생성");
-    
-     DB((err1, connection1)=>{
-      connection1.query(initQuery.checkSchema, (error1) =>{
+
+    pool.getConnection(function (err, connection1) {
+      connection1.query(initQuery.checkSchema, (error1) => {
         if (error1) throw error;
         console.log("carpoolDB 생성 완료\ncarpoolDB에서 Table 여부를 확인한 후 tables 생성");
-        DB((err2, connection2) => {
+        pool.getConnection(function (err2, connection2) {
           connection2.query(initQuery.checkTable, (error2) => {
             if (error2) throw error2;
             console.log("tables 생성 완료");
+
+            console.log(pool._freeConnections.indexOf(connection2));
+            connection2.release();
+            console.log(pool._freeConnections.indexOf(connection2));
           });
-          connection2.release();
         });
+        console.log(pool._freeConnections.indexOf(connection1));
+        connection1.release();
+        console.log(pool._freeConnections.indexOf(connection1));
       });
-      connection1.release();
-    }); 
+    });
+
   }
 }
 
 // users table의 memberID, memberPW는 임시 값.
 var initQuery = {
   checkSchema : `CREATE DATABASE IF NOT EXISTS carpoolDB; USE carpoolDB`,
-  checkTable : `CREATE TABLE IF NOT EXISTS users(
+  checkTable : `USE carpoolDB; CREATE TABLE IF NOT EXISTS carpoolDB.users(
     id                INT(11)     NOT NULL AUTO_INCREMENT,
     name              VARCHAR(20) NOT NULL,
     report_num        INT(6)      DEFAULT 0 NOT NULL,
@@ -63,7 +52,7 @@ var initQuery = {
     memberID          VARCHAR(20) NOT NULL UNIQUE,
     memberPW          VARCHAR(20) NOT NULL,
     PRIMARY KEY(id)
-  );  CREATE TABLE IF NOT EXISTS roominfos(
+  );  CREATE TABLE IF NOT EXISTS carpoolDB.roominfos(
     id                    INT(11)     NOT NULL AUTO_INCREMENT,
     car_type              VARCHAR(3)  NOT NULL,
     depart_place          VARCHAR(50) NOT NULL,

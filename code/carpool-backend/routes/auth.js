@@ -1,7 +1,5 @@
 var express = require('express');
-const { connection } = require('../db/initiate');
 const { route } = require('.');
-var DB = require('../db/initiate').connection;
 var pool = require('../db/initiate').pool;
 var sqlQuery = require('../db/initiate').checkQuery;
 var template = require('../HTML/template').template;

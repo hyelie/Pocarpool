@@ -1,14 +1,14 @@
 서버 시작 시
 CREATE DATABASE IF NOT EXISTS carpoolDB;
 USE carpoolDB;
-CREATE TABLE IF NOT EXISTS users(
+CREATE TABLE IF NOT EXISTS carpoolDB.users(
   id                INT(11)     NOT NULL AUTO_INCREMENT,
   name              VARCHAR(20) NOT NULL,
   report_num        INT(6)      DEFAULT 0 NOT NULL,
   isAdmin           BOOL        DEFAULT false NOT NULL,
   PRIMARY KEY(id)
 );
-CREATE TABLE IF NOT EXISTS roominfos(
+CREATE TABLE IF NOT EXISTS carpoolDB.roominfos(
   id                    INT(11)     NOT NULL AUTO_INCREMENT,
   car_type              VARCHAR(3)  NOT NULL,
   depart_place          VARCHAR(50) NOT NULL,
@@ -24,13 +24,13 @@ CREATE TABLE IF NOT EXISTS roominfos(
   confirm_time          DATETIME    NOT NULL,
   PRIMARY KEY(id)
 );
-CREATE TABLE IF NOT EXISTS users_and_rooms_infos(
+CREATE TABLE IF NOT EXISTS carpoolDB.users_and_rooms_infos(
   id                INT(11)     NOT NULL AUTO_INCREMENT,
   userId            INT(11)     NOT NULL,
   roomId            INT(11)     NOT NULL,
   PRIMARY KEY(id)
 );
-CREATE TABLE IF NOT EXISTS chatlogs(
+CREATE TABLE IF NOT EXISTS carpoolDB.chatlogs(
   id                INT(11)     NOT NULL AUTO_INCREMENT,
   roomId            INT(11)     NOT NULL,
   userId            INT(11)     NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS chatlogs(
   isWorkDone        BOOL        NOT NULL DEFAULT false,
   PRIMARY KEY(id)
 );
-CREATE TABLE IF NOT EXISTS reports(
+CREATE TABLE IF NOT EXISTS carpoolDB.reports(
   id                INT(11)     NOT NULL AUTO_INCREMENT,
   reportId          INT(11)     NOT NULL,
   accusedId         INT(11)     NOT NULL,

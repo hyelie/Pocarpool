@@ -189,3 +189,5 @@ router.delete('/', function (req, res, next) {
 router.use((err, req, res, next) => {
     res.json({ message: err.message });
 })
+
+module.exports = router;
