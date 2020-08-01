@@ -60,7 +60,6 @@ router.get('/', function (req, res, next) {
             connection.release();
             console.log(pool._freeConnections.indexOf(connection));
         });
-        res.end();
     }
 });
 
@@ -102,7 +101,6 @@ router.post('/', (req, res, next) => {
                 connection.release();
                 console.log(pool._freeConnections.indexOf(connection));
             });
-
             res.status(200).end();
         }
     }
