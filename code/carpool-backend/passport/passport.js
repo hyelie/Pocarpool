@@ -1,6 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var DB = require('../db/initiate').connection;
+var pool = require('../db/initiate').pool;
 
 module.exports = () => {
     // login시 호출되며 done에 있는 user.id가 deserializeUser의 첫 번째 parameter로 들어감.
@@ -10,7 +11,7 @@ module.exports = () => {
     });
     // login 시 어떤 사용자인지를 돌려주는 함수. done에 있는 user가 request.user가 됨.
     passport.deserializeUser(function (id, done) {
-        DB((err, connection) => {
+        pool.getConnection(function(err, connection){
             if (!err) {
                 var findByID_query = `SELECT * FROM carpoolDB.users WHERE memberID = (?);`
                 connection.query(findByID_query, [id], (err, result) => {
@@ -22,6 +23,9 @@ module.exports = () => {
                     done(err, result[0]);
                 });
             }
+            console.log(pool._freeConnections.indexOf(connection));
+            connection.release();
+            console.log(pool._freeConnections.indexOf(connection));
         });
     });
     // 일단은 local 로그인으로 작성, 추후 통합로그인 모듈이 완성되면 로그인 방식 수정 요망.
@@ -33,7 +37,7 @@ module.exports = () => {
         passReqToCallback: true
     }, (req, username, password, done) => {
         console.log("localstrategy", username, password);
-        DB((err, connection) => {
+        pool.getConnection(function(err, connection){
             if (err) return done(findError);     // DB 에러
             var findByID_query = `SELECT * FROM carpoolDB.users WHERE memberID = (?);`
             connection.query(findByID_query, [username], (err, result) => {
@@ -51,6 +55,9 @@ module.exports = () => {
                     return done(null, result);
                 }
             });
+            console.log(pool._freeConnections.indexOf(connection));
+            connection.release();
+            console.log(pool._freeConnections.indexOf(connection));
         });
     }));
 }

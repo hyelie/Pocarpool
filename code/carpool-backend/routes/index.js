@@ -26,21 +26,27 @@ router.get('/login', function(req, res, next) {
 });
 
 router.get('/DBcheck', function(req, res, next){
-  console.log('DB 확인합니다...')
-  DB((poolerr, connection) =>{
-    connection.query(sqlQuery.checkDBs, function(err, results){
-      if(err) throw err;
+  console.log('DB 확인합니다...');
+
+  pool.getConnection(function (err, connection) {
+    connection.query(sqlQuery.checkDBs, function (err, results) {
+      if (err) throw err;
       console.log("DB : ", results);
       connection.release();
     });
+    console.log(pool._freeConnections.indexOf(connection));
+    connection.release();
+    console.log(pool._freeConnections.indexOf(connection));
   });
-  console.log('Tables 확인합니다...');
-  DB((poolerr, connection) =>{
+  pool.getConnection(function (err, connection) {
     connection.query(sqlQuery.checkTables, function(err, results){
       if(err) throw err;
       console.log("Tables : ", results);
       connection.release();
     });
+    console.log(pool._freeConnections.indexOf(connection));
+    connection.release();
+    console.log(pool._freeConnections.indexOf(connection));
   });
 });
 

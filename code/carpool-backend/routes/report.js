@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-var DB = require('../db/initiate').connection;
+var pool = require('../db/initiate').pool;
 // 미구현된 부분은 TODO : task의 형식으로 달았다.
 
 // POST /report
@@ -33,7 +33,7 @@ router.post('/', function (req, res, next) {
                                                 AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ?)
                                         );`
             var QueryVariable = [req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.reportReason, reportTime, req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.chatlogs, req.body.reportUserID, req.body.accuseUserID, req.body.roomID,];
-            DB((err, connection) => {
+            pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할때
                     console.log("POST /report?id= error : 서버 이용자가 너무 많습니다.");
@@ -49,7 +49,9 @@ router.post('/', function (req, res, next) {
                         }
                     })
                 }
+                console.log(pool._freeConnections.indexOf(connection));
                 connection.release();
+                console.log(pool._freeConnections.indexOf(connection));
             });
         }
         res.end();
@@ -83,7 +85,7 @@ router.get('/', function (req, res, next) {
                                 WHERE reports.id = ?;`
             var variable = req.query.id;
         }
-        DB((err, connection) => {
+        pool.getConnection(function (err, connection) {
             if (err) {
                 // TODO : DB에 접근 못 할때
                 console.log("GET /report error : 서버 이용자가 너무 많습니다.");
@@ -100,7 +102,9 @@ router.get('/', function (req, res, next) {
                     }
                 })
             }
+            console.log(pool._freeConnections.indexOf(connection));
             connection.release();
+            console.log(pool._freeConnections.indexOf(connection));
         });
         res.end();
     }
@@ -117,8 +121,8 @@ router.put('/', function (req, res, next) {
         next(new Error('PUT /report error:2'));
     } else {
         // reportid에 해당하는 신고 세부 내용(채팅)
-        var ReportUpdateQuery = `UPDATE carpooldb.reports SET isWorkDone = 1 WHERE id = ?;`
-        DB((err, connection) => {
+        var ReportUpdateQuery = `UPDATE carpooldb.reports SET isWorkDone = 1 WHERE id = ?;`;
+        pool.getConnection(function (err, connection) {
             if (err) {
                 // TODO : DB에 접근 못 할때
                 console.log("PUT /report?id= error : 서버 이용자가 너무 많습니다.");
@@ -134,7 +138,9 @@ router.put('/', function (req, res, next) {
                     }
                 })
             }
+            console.log(pool._freeConnections.indexOf(connection));
             connection.release();
+            console.log(pool._freeConnections.indexOf(connection));
         });
         res.end();
     }
@@ -150,8 +156,8 @@ router.delete('/', function (req, res, next) {
         // TODO : 접근 권한 오류
         next(new Error('DELETE /report error:2'));
     } else {
-        var ReportDeleteQuery = `DELETE FROM carpoolDB.reports WHERE id=?; DELETE FROM carpoolDB.chatlogs WHERE reportID=?;`
-        DB((err, connection) => {
+        var ReportDeleteQuery = `DELETE FROM carpoolDB.reports WHERE id=?; DELETE FROM carpoolDB.chatlogs WHERE reportID=?;`;
+        pool.getConnection(function (err, connection) {
             if (err) {
                 // TODO : DB에 접근 못 할때
                 console.log("DELETE /report?id= error : 서버 이용자가 너무 많습니다.");
@@ -167,7 +173,9 @@ router.delete('/', function (req, res, next) {
                     }
                 })
             }
+            console.log(pool._freeConnections.indexOf(connection));
             connection.release();
+            console.log(pool._freeConnections.indexOf(connection));
         });
         res.end();
     }

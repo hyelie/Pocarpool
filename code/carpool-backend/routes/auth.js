@@ -2,6 +2,7 @@ var express = require('express');
 const { connection } = require('../db/initiate');
 const { route } = require('.');
 var DB = require('../db/initiate').connection;
+var pool = require('../db/initiate').pool;
 var sqlQuery = require('../db/initiate').checkQuery;
 var template = require('../HTML/template').template;
 var router = express.Router();
@@ -32,7 +33,7 @@ router.post('/register_process', function (req, res, next) {
     var username = req.body.name;
     var userid = req.body.id;
     var userpw = req.body.pwd;
-    DB((poolerr, connection) => {
+    pool.getConnection(function(err, connection){
         if (!poolerr) {
             console.log("회원가입 정보 확인", username, userid, userpw);
             var adduserquery = `INSERT INTO carpoolDB.users(name, memberID, memberPW) VALUES (?, ?, ?)`;
@@ -46,7 +47,9 @@ router.post('/register_process', function (req, res, next) {
                 }
             });
         }
+        console.log(pool._freeConnections.indexOf(connection));
         connection.release();
+        console.log(pool._freeConnections.indexOf(connection));
     });
 });
 

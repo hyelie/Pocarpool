@@ -9,6 +9,15 @@ const pool = mysql.createPool({
   connectionLimit : 50
 });
 
+exports.pool = mysql.createPool({
+  host : 'localhost',
+  user : 'poapper',
+  password : 'poapper',
+  multipleStatements : true,
+  waitForConnections : true,
+  connectionLimit : 5
+});
+
 exports.connection = function(callback){
   pool.getConnection(function(err, connection){
     if(!err){
