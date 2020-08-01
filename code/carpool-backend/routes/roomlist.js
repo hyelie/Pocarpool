@@ -109,7 +109,6 @@ router.post('/', (req, res, next) => {
 });
 
 // PUT /roomlist
-// 입력을 1개씩 못 받는 에러가 있음.
 router.put('/', (req, res, next) => {
     // TODO : 로그인 에러
     if (req.user == undefined) {

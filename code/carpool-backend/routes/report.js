@@ -25,8 +25,9 @@ router.post('/', function (req, res, next) {
                                         AND EXISTS (SELECT users.id FROM carpooldb.users WHERE users.id = ? LIMIT 1)
                                         AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ? LIMIT 1);
                                     INSERT INTO carpooldb.chatlogs (reportID, chat_content) SELECT LAST_INSERT_ID(), ? FROM dual
-                                        WHERE EXISTS(SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=? AND reports.accuseUserID=? AND reports.roomID = ? LIMIT 1);`
-            var QueryVariable = [req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.reportReason, reportTime, req.body.reportUserID, req.body.accuseUserID, req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.chatlogs, req.body.reportUserID, req.body.accuseUserID, req.body.roomID];
+                                        WHERE EXISTS(SELECT * FROM carpoolDB.reports WHERE reports.reportUserID=? AND reports.accuseUserID=? AND reports.roomID = ? LIMIT 1);
+                                    UPDATE carpooldb.users SET report_num = report_num+1 WHERE id = ?;`
+            var QueryVariable = [req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.reportReason, reportTime, req.body.reportUserID, req.body.accuseUserID, req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.chatlogs, req.body.reportUserID, req.body.accuseUserID, req.body.roomID, req.body.accuseUserID];
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할때
