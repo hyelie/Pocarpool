@@ -43,14 +43,16 @@ router.post('/', function (req, res, next) {
                         if (sqlErr) {
                             // TODO : sql 내부 에러 처리
                             console.log("POST /report error : SQL 내부 에러. query를 확인해 주세요.");
+                            res.status(400);
                         } else {
-                            res.status(200).end();
+                            res.status(200);
                         }
                     })
                 }
                 connection.release();
             });
         }
+        res.end();
     }
 });
 
@@ -91,14 +93,16 @@ router.get('/', function (req, res, next) {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("GET /report error : SQL 내부 에러. query를 확인해 주세요.");
+                        res.status(400);
                     } else {
                         res.json(result);
-                        res.status(200).end();
+                        res.status(200);
                     }
                 })
             }
             connection.release();
         });
+        res.end();
     }
 });
 
@@ -124,13 +128,15 @@ router.put('/', function (req, res, next) {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("PUT /report error : SQL 내부 에러. query를 확인해 주세요.");
+                        res.status(400);
                     } else {
-                        res.status(200).end();
+                        res.status(200);
                     }
                 })
             }
             connection.release();
         });
+        res.end();
     }
 });
 
@@ -155,13 +161,23 @@ router.delete('/', function (req, res, next) {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("DELETE /report error : SQL 내부 에러. query를 확인해 주세요.");
+                        res.status(400);
                     } else {
-                        res.status(200).end();
+                        res.status(200);
                     }
                 })
             }
             connection.release();
         });
+        res.end();
     }
 });
 
+// 오류 처리기
+// 0 : TODO : 로그인 에러
+// 1 : TODO : 입력값 에러
+// 2 : TODO : 접근 에러
+// 3 : TODO : 동시에 너무 많은 접속이 있을 때
+router.use((err, req, res, next) => {
+    res.json({ message: err.message });
+})

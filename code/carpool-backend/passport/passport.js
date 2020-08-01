@@ -5,7 +5,7 @@ var DB = require('../db/initiate').connection;
 module.exports = () => {
     // login시 호출되며 done에 있는 user.id가 deserializeUser의 첫 번째 parameter로 들어감.
     passport.serializeUser(function (user, done) {
-        console.log("serializeUser 확인", user[0]);
+        //console.log("serializeUser 확인", user[0]);
         done(null, user[0].memberID);
     });
     // login 시 어떤 사용자인지를 돌려주는 함수. done에 있는 user가 request.user가 됨.
@@ -18,7 +18,7 @@ module.exports = () => {
                         console.log("사용자 정보를  불러올 수 없습니다.");
                     }
                     // result 중에 id로 검사하는 문
-                    console.log("deserializeUser", id, result[0]);
+                    //console.log("deserializeUser", id, result[0]);
                     done(err, result[0]);
                 });
             }

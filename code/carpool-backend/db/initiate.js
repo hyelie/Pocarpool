@@ -4,13 +4,15 @@ const pool = mysql.createPool({
   host : 'localhost',
   user : 'poapper',
   password : 'poapper',
-  multipleStatements : true
-})
+  multipleStatements : true,
+  waitForConnections : true,
+  connectionLimit : 50
+});
 
 exports.connection = function(callback){
   pool.getConnection(function(err, connection){
     if(!err){
-      callback(err, connection);
+        callback(err, connection);
     }
   });
 }
@@ -61,7 +63,7 @@ var initQuery = {
     arrive_time           DATETIME    NOT NULL,
     current_headcount     INT(2)      NOT NULL,
     total_headcount       INT(2)      NOT NULL,
-    curreunt_carrier_num  INT(2)      NOT NULL,
+    current_carrier_num   INT(2)      NOT NULL,
     total_carrier_num     INT(2)      NOT NULL,
     isConfirm             BOOL        NOT NULL,
     confirm_time          DATETIME    NOT NULL,

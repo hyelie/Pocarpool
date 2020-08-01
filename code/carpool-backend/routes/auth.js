@@ -44,9 +44,9 @@ router.post('/register_process', function (req, res, next) {
                     console.log("등록 완료~");
                     res.redirect('/');
                 }
-                connection.release();
             });
         }
+        connection.release();
     });
 });
 
