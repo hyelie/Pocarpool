@@ -23,6 +23,7 @@ app.set('port', port);
 initDB.initMysql(pool);
  // 만약 서버에 database와 schema가 없으면 만들어 주어야 함. 만들고 출력하는 조건문을 여기 넣자.
 var server = http.createServer(app);
+app.io.attach(server);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -33,6 +34,7 @@ server.listen(port,(error)=>{
 });
 server.on('error', onError);
 server.on('listening', onListening);
+
 
 /**
  * Normalize a port into a number, string, or false.

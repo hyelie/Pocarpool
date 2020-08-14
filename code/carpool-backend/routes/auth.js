@@ -31,7 +31,7 @@ router.post('/register_process', function (req, res, next) {
     var username = req.body.name;
     var userid = req.body.id;
     var userpw = req.body.pwd;
-    pool.getConnection(function(err, connection){
+    pool.getConnection(function(poolerr, connection){
         if (!poolerr) {
             console.log("회원가입 정보 확인", username, userid, userpw);
             var adduserquery = `INSERT INTO carpoolDB.users(name, memberID, memberPW) VALUES (?, ?, ?)`;
