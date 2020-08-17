@@ -14,6 +14,7 @@ var authRouter = require('./routes/auth');
 var roomlistRouter = require('./routes/roomlist');
 var reportRouter = require('./routes/report');
 var chatRouter = require('./routes/chat');
+var chatActivity = require('./routes/socket').chatActivity;
 
 var app = express();
 
@@ -47,6 +48,7 @@ app.use('/auth', authRouter);
 app.use('/roomlist', roomlistRouter);
 app.use('/report', reportRouter);
 app.use('/chat', chatRouter);
+app.io.on('connection', chatActivity);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
