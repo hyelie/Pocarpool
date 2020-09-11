@@ -12,7 +12,7 @@ module.exports = () => {
     passport.deserializeUser(function (id, done) {
         pool.getConnection(function(err, connection){
             if (!err) {
-                var findByID_query = `SELECT * FROM carpoolDB.users WHERE memberID = (?);`
+                var findByID_query = `SELECT * FROM pocarpool.users WHERE memberID = (?);`
                 connection.query(findByID_query, [id], (err, result) => {
                     if (err) {
                         console.log("사용자 정보를  불러올 수 없습니다.");
@@ -38,7 +38,7 @@ module.exports = () => {
         console.log("localstrategy", username, password);
         pool.getConnection(function(err, connection){
             if (err) return done(findError);     // DB 에러
-            var findByID_query = `SELECT * FROM carpoolDB.users WHERE memberID = (?);`
+            var findByID_query = `SELECT * FROM pocarpool.users WHERE memberID = (?);`
             connection.query(findByID_query, [username], (err, result) => {
                 console.log("localstrategy find result", result[0]);
                 // result 내부에서 id로 검사하는 문
