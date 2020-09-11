@@ -50,13 +50,13 @@ var initQuery = {
 }
 
 exports.pool = mysql.createPool({
-  host : 'poapper',
+  host : 'host',
   user : 'poapper',
   password : 'djffls><akdrh123',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 50
-});
+}); 
 
 exports.checkQuery = {
   checkDBs : `SHOW DATABASES;`,
@@ -68,6 +68,9 @@ exports.exeQuery = {
     console.log("pool에서 Schema 여부를 확인 후 pocarpool 생성");
 
     pool.getConnection(function (err, connection1) {
+      if(err){
+        console.log("err 발생!", err)
+      }
       connection1.query(initQuery.checkSchema, (error1) => {
         if (error1) throw error1;
         console.log("pocarpool 생성 완료\npocarpool에서 Table 여부를 확인한 후 tables 생성");
