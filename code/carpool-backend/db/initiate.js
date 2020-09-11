@@ -68,6 +68,9 @@ exports.exeQuery = {
     console.log("pool에서 Schema 여부를 확인 후 pocarpool 생성");
 
     pool.getConnection(function (err, connection1) {
+      if(err){
+        console.log("뭐지??");
+      }
       connection1.query(initQuery.checkSchema, (error1) => {
         if (error1) throw error;
         console.log("pocarpool 생성 완료\npocarpool에서 Table 여부를 확인한 후 tables 생성");
