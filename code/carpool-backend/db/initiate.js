@@ -1,45 +1,5 @@
 var mysql = require('mysql');
 const { connect } = require('../app');
-exports.pool = mysql.createPool({
-  host : 'pocarpool',
-  user : 'poapper',
-  password : 'djffls><akdrh123',
-  multipleStatements : true,
-  waitForConnections : true,
-  connectionLimit : 50
-});
-
-exports.checkQuery = {
-  checkDBs : `SHOW DATABASES;`,
-  checkTables : `USE pocarpool; SHOW TABLES;`,
-}
-
-exports.exeQuery = {
-  initMysql: function (pool) {
-    console.log("pool에서 Schema 여부를 확인 후 pocarpool 생성");
-
-    pool.getConnection(function (err, connection1) {
-      connection1.query(initQuery.checkSchema, (error1) => {
-        if (error1) throw error;
-        console.log("pocarpool 생성 완료\npocarpool에서 Table 여부를 확인한 후 tables 생성");
-        pool.getConnection(function (err2, connection2) {
-          connection2.query(initQuery.checkTable, (error2) => {
-            if (error2) throw error2;
-            console.log("tables 생성 완료");
-
-            console.log(pool._freeConnections.indexOf(connection2));
-            connection2.release();
-            console.log(pool._freeConnections.indexOf(connection2));
-          });
-        });
-        console.log(pool._freeConnections.indexOf(connection1));
-        connection1.release();
-        console.log(pool._freeConnections.indexOf(connection1));
-      });
-    });
-
-  }
-}
 
 // users table의 memberID, memberPW는 임시 값.
 var initQuery = {
@@ -87,4 +47,45 @@ var initQuery = {
     PRIMARY KEY(id)
   );`,
   chatlog_rearrange : `ALTER TABLE chatlogs AUTO_INCREMENT=1; SET @COUNT=0; UPDATE chatlogs SET id = @COUNT:=@COUNT+1;`
+}
+
+exports.pool = mysql.createPool({
+  host : 'pocarpool',
+  user : 'poapper',
+  password : 'djffls><akdrh123',
+  multipleStatements : true,
+  waitForConnections : true,
+  connectionLimit : 50
+});
+
+exports.checkQuery = {
+  checkDBs : `SHOW DATABASES;`,
+  checkTables : `USE pocarpool; SHOW TABLES;`,
+}
+
+exports.exeQuery = {
+  initMysql: function (pool) {
+    console.log("pool에서 Schema 여부를 확인 후 pocarpool 생성");
+
+    pool.getConnection(function (err, connection1) {
+      connection1.query(initQuery.checkSchema, (error1) => {
+        if (error1) throw error;
+        console.log("pocarpool 생성 완료\npocarpool에서 Table 여부를 확인한 후 tables 생성");
+        pool.getConnection(function (err2, connection2) {
+          connection2.query(initQuery.checkTable, (error2) => {
+            if (error2) throw error2;
+            console.log("tables 생성 완료");
+
+            console.log(pool._freeConnections.indexOf(connection2));
+            connection2.release();
+            console.log(pool._freeConnections.indexOf(connection2));
+          });
+        });
+        console.log(pool._freeConnections.indexOf(connection1));
+        connection1.release();
+        console.log(pool._freeConnections.indexOf(connection1));
+      });
+    });
+
+  }
 }
