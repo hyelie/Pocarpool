@@ -34,10 +34,11 @@ router.post('/register_process', function (req, res, next) {
     pool.getConnection(function(poolerr, connection){
         if (!poolerr) {
             console.log("회원가입 정보 확인", username, userid, userpw);
-            var adduserquery = `INSERT INTO carpoolDB.users(name, memberID, memberPW) VALUES (?, ?, ?)`;
+            var adduserquery = `INSERT INTO pocarpool.users(name, memberID, memberPW) VALUES (?, ?, ?)`;
             connection.query(adduserquery, [username, userid, userpw], function (err, results, fields) {
                 if (err) {
-                    console.log("이미 존재하는 ID입니다!");
+                    console.log(err)
+                    //console.log("이미 존재하는 ID입니다!");
                     res.redirect('/auth/register');  
                 } else {
                     console.log("등록 완료~");
