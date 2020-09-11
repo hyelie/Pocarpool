@@ -1,4 +1,4 @@
-var mysql = require('mysql');
+var mysql = require('mysql2');
 const { connect } = require('../app');
 
 // users table의 memberID, memberPW는 임시 값.
