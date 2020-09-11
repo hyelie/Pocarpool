@@ -62,7 +62,7 @@ exports.pool = mysql.createPool({
 exports.checkQuery = {
   checkDBs : `SHOW DATABASES;`,
   checkTables : `USE pocarpool; SHOW TABLES;`,
-}
+};
 
 exports.exeQuery = {
   initMysql: function (pool) {
@@ -70,7 +70,7 @@ exports.exeQuery = {
 
     pool.getConnection(function (err, connection1) {
       if(err){
-        console.log("err 발생!", err)
+        console.log("err 발생!", err);
       }
       connection1.query(initQuery.checkSchema, (error1) => {
         if (error1) throw error1;
