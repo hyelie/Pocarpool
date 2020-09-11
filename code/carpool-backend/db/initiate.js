@@ -1,9 +1,9 @@
 var mysql = require('mysql');
 const { connect } = require('../app');
 exports.pool = mysql.createPool({
-  host : 'localhost',
+  host : 'pocarpool',
   user : 'poapper',
-  password : 'poapper',
+  password : 'djffls><akdrh123',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 50
