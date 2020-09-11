@@ -50,7 +50,7 @@ var initQuery = {
 }
 
 exports.pool = mysql.createPool({
-  host : 'host',
+  host : 'pocarpool.poapper.com',
   user : 'poapper',
   password : 'djffls><akdrh123',
   multipleStatements : true,
