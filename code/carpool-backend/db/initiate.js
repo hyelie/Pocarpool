@@ -55,7 +55,8 @@ exports.pool = mysql.createPool({
   password : 'djffls><akdrh123',
   multipleStatements : true,
   waitForConnections : true,
-  connectionLimit : 50
+  connectionLimit : 50,
+  port: '/var/run/mysqld/mysqld.sock'
 }); 
 
 exports.checkQuery = {
