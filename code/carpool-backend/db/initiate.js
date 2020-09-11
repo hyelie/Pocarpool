@@ -11,17 +11,17 @@ exports.pool = mysql.createPool({
 
 exports.checkQuery = {
   checkDBs : `SHOW DATABASES;`,
-  checkTables : `USE carpoolDB; SHOW TABLES;`,
+  checkTables : `USE pocarpool; SHOW TABLES;`,
 }
 
 exports.exeQuery = {
   initMysql: function (pool) {
-    console.log("pool에서 Schema 여부를 확인 후 carpoolDB 생성");
+    console.log("pool에서 Schema 여부를 확인 후 pocarpool 생성");
 
     pool.getConnection(function (err, connection1) {
       connection1.query(initQuery.checkSchema, (error1) => {
         if (error1) throw error;
-        console.log("carpoolDB 생성 완료\ncarpoolDB에서 Table 여부를 확인한 후 tables 생성");
+        console.log("pocarpool 생성 완료\npocarpool에서 Table 여부를 확인한 후 tables 생성");
         pool.getConnection(function (err2, connection2) {
           connection2.query(initQuery.checkTable, (error2) => {
             if (error2) throw error2;
@@ -43,8 +43,8 @@ exports.exeQuery = {
 
 // users table의 memberID, memberPW는 임시 값.
 var initQuery = {
-  checkSchema : `CREATE DATABASE IF NOT EXISTS carpoolDB; USE carpoolDB`,
-  checkTable : `USE carpoolDB; CREATE TABLE IF NOT EXISTS carpoolDB.users(
+  checkSchema : `CREATE DATABASE IF NOT EXISTS pocarpool; USE pocarpool`,
+  checkTable : `USE pocarpool; CREATE TABLE IF NOT EXISTS pocarpool.users(
     id                INT(11)     NOT NULL AUTO_INCREMENT,
     name              VARCHAR(20) NOT NULL,
     report_num        INT(6)      DEFAULT 0 NOT NULL,
@@ -52,7 +52,7 @@ var initQuery = {
     memberID          VARCHAR(20) NOT NULL UNIQUE,
     memberPW          VARCHAR(20) NOT NULL,
     PRIMARY KEY(id)
-  );  CREATE TABLE IF NOT EXISTS carpoolDB.roominfos(
+  );  CREATE TABLE IF NOT EXISTS pocarpool.roominfos(
     id                    INT(11)     NOT NULL AUTO_INCREMENT,
     car_type              VARCHAR(3)  NOT NULL,
     depart_place          VARCHAR(50) NOT NULL,
