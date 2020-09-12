@@ -49,6 +49,7 @@ router.get('/', function (req, res, next) {
         pool.getConnection(function (err, connection) {
             if (!err) {
                 connection.query(sql, element, (err, rows, fields) => {
+                    console.log("error",err)
                     if (err) throw err;
                     console.log(rows)
 
@@ -91,7 +92,7 @@ router.post('/', (req, res, next) => {
             //시간: 2020-07-29 14:10:23 형태를 한다
             var sql = `INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,0,0,0,0,0,NOW())`;
 
-            pool.getConnection(function (err, connection) {
+            pool.getConnection(function (err1, connection) {
                 if (!err1) {
                     connection.query(sql, [car_type, depart_place, arrive_place, depart_time, arrive_time], (err2, rows, fields) => {
                         if (err2) throw err2;
