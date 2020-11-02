@@ -3,7 +3,7 @@ const { connect } = require('../app');
 
 // users table의 memberID, memberPW는 임시 값.
 var initQuery = {
-  checkSchema : `CREATE DATABASE IF NOT EXISTS pocarpool; USE pocarpool`,
+  checkSchema : `CREATE DATABASE IF NOT EXISTS pocarpool; USE pocarpool;`,
   checkTable : `USE pocarpool; CREATE TABLE IF NOT EXISTS pocarpool.users(
     id                INT(11)     NOT NULL AUTO_INCREMENT,
     name              VARCHAR(20) NOT NULL,

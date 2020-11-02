@@ -168,11 +168,12 @@ router.put('/', (req, res, next) => {
 });
 
 // DELETE /roomlist?roomID=
+// -> POST /roomlist/delete
 // pass
-router.delete('/', (req, res, next) => {
+router.post('/delete', (req, res, next) => {
     // TODO : 로그인 에러
     if (req.user == undefined) {
-        next(new Error('DELETE /roomlist error:0'));
+        next(new Error('POST /roomlist/delete error:0'));
     } else {
         // DELETE FROM tablename WHERE condition;
         // 값 삭제
@@ -181,15 +182,15 @@ router.delete('/', (req, res, next) => {
             if (err) {
                 // TODO : DB에 접근 못 할때
                 connection.release();
-                console.log("DELETE /roomlist error : 서버 이용자가 너무 많습니다.");
-                next(new Error('DELETE /roomlist error:3'));
+                console.log("POST /roomlist/delete error : 서버 이용자가 너무 많습니다.");
+                next(new Error('POST /roomlist/delete error:3'));
             } else {
-                connection.query(deleteQuery, [req.query.roomID, req.query.roomID], (sqlErr) => {
+                connection.query(deleteQuery, [req.body.roomID, req.body.roomID], (sqlErr) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
-                        console.log("DELETE /roomlist error : SQL 내부 에러. query를 확인해 주세요. 해당하는 방이 없습니다.");
+                        console.log("POST /roomlist/delete error : SQL 내부 에러. query를 확인해 주세요. 해당하는 방이 없습니다.");
                         connection.release();
-                        next(new Error('DELETE /roomlist error:4'));
+                        next(new Error('POST /roomlist/delete error:4'));
                     } else {
                         console.log("삭제 완료");
                         res.status(200);
@@ -205,16 +206,17 @@ router.delete('/', (req, res, next) => {
 });
 
 // GET /roomlist/userid?userID=
+// -> POST /roomlist/getroom
 // pass
-router.get('/userid', function (req, res, next) {
+router.post('/getroom', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.user == undefined) {
-        next(new Error('GET /roomlist error:0'));
+        next(new Error('POST /roomlist/getroom error:0'));
     } else {
         // admin이 아닌데 다른 id로 접근하는 경우에는 에러
-        if (req.user.isAdmin == 0 && req.query.userID != req.user.id) {
+        if (req.user.isAdmin == 0 && req.body.userID != req.user.id) {
             // TODO : 접근 권한 오류
-            next(new Error('GET /roomlist error:2'));
+            next(new Error('POST /roomlist/getroom error:2'));
         } else {
             // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
             var belongQuery = `SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount,
@@ -224,17 +226,17 @@ router.get('/userid', function (req, res, next) {
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할 때
-                    console.log("GET /roomlist/userid?id= error : 서버 이용자가 너무 많습니다.");
+                    console.log("POST /roomlist/getroom error : 서버 이용자가 너무 많습니다.");
                     connection.release();
-                    next(new Error('GET /roomlist error:3'));
+                    next(new Error('POST /roomlist/getroom error:3'));
                 } else {
-                    connection.query(belongQuery, [req.query.userID], (err, result) => {
+                    connection.query(belongQuery, [req.body.userID], (err, result) => {
                         console.log(belongQuery);
                         if (err) {
                             // TODO : sql 내부 에러 처리
-                            console.log("GET /roomlist/userid?id= error : SQL 내부 에러. query를 확인해 주세요.");
+                            console.log("POST /roomlist/getroom error : SQL 내부 에러. query를 확인해 주세요.");
                             connection.release();
-                            next(new Error('GET /roomlist error:4'));
+                            next(new Error('POST /roomlist/getroom error:4'));
                         } else {
                             console.log("id에 해당하는 사람이 속해있는 방의 정보 출력", result);
                             res.json(result);
@@ -250,71 +252,77 @@ router.get('/userid', function (req, res, next) {
     }
 });
 
-// POST /roomlist/userid
+// POST /roomlist/adduser
 // pass
-router.post('/userid', function (req, res, next) {
+router.post('/adduser', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.user == undefined) {
         next(new Error('POST /roomlist/userid error:0'));
     } else {
-        // query
-        var addUsersRoomQuery = `INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT ?, ? FROM dual
-                                    WHERE EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = ? LIMIT 1)
-                                            AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ? LIMIT 1)
-                                            AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ? LIMIT 1);`;
-        var userID = req.body.userID;
-        var roomID = req.body.roomID;
-        pool.getConnection(function (err, connection) {
-            if (err) {
-                // TODO : DB에 접근 못 할 때
-                console.log("POST /roomlist/userid error : 서버 이용자가 너무 많습니다.");
+        if (req.body.userID != req.user.id) {
+            // TODO : 접근 권한 오류
+            next(new Error('POST /roomlist/adduser error:2'));
+        } else {
+            // query
+            var addUsersRoomQuery = `INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT ?, ? FROM dual
+                                        WHERE EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = ? LIMIT 1)
+                                        AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ? LIMIT 1)
+                                        AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ? LIMIT 1);`;
+            var userID = req.body.userID;
+            var roomID = req.body.roomID;
+            pool.getConnection(function (err, connection) {
+                if (err) {
+                    // TODO : DB에 접근 못 할 때
+                    console.log("POST /roomlist/userid error : 서버 이용자가 너무 많습니다.");
+                    connection.release();
+                    next(new Error('POST /roomlist/userid error:3'));
+                } else {
+                    connection.query(addUsersRoomQuery, [userID, roomID, userID, roomID, userID, roomID], (err, result) => {
+                        if (err) {
+                            // TODO : sql 내부 에러 처리
+                            console.log("POST /roomlist/userid error : SQL 내부 에러. query를 확인해 주세요.");
+                            connection.release();
+                            next(new Error('POST /roomlist/userid error:4'));
+                        } else {
+                            res.status(200);
+                        }
+                    });
+                }
+                console.log(pool._freeConnections.indexOf(connection));
                 connection.release();
-                next(new Error('POST /roomlist/userid error:3'));
-            } else {
-                connection.query(addUsersRoomQuery, [userID, roomID, userID, roomID, userID, roomID], (err, result) => {
-                    if (err) {
-                        // TODO : sql 내부 에러 처리
-                        console.log("POST /roomlist/userid error : SQL 내부 에러. query를 확인해 주세요.");
-                        connection.release();
-                        next(new Error('POST /roomlist/userid error:4'));
-                    } else {
-                        res.status(200);
-                    }
-                });
-            }
-            console.log(pool._freeConnections.indexOf(connection));
-            connection.release();
-            console.log(pool._freeConnections.indexOf(connection));
-            res.end();
-        });
+                console.log(pool._freeConnections.indexOf(connection));
+                res.end();
+            });
+        }
     }
 });
 
 // DELETE /roomlist/userid/:userID/:roomID
+// -> POST /roomlist/deluser
 // pass
-router.delete('/userid/:userID/:roomID', (req, res, next) => {
+router.post('/deluser', (req, res, next) => {
     // TODO : 로그인 에러
     if (req.user == undefined) {
-        next(new Error('DELETE /roomlist/userid error:0'));
-    } else {
-        if (req.user.isAdmin == 0 && req.params.userID != req.user.id) {
+        next(new Error('POST /roomlist/deluser error:0'));
+    } else {l
+        if (req.user.isAdmin == 0 && req.body.userID != req.user.id) {
             // TODO : 접근 권한 오류
-            next(new Error('DELETE /roomlist/userid/:userID/:roomID error:2'));
+            next(new Error('POST /roomlist/deluser error:2'));
         } else {
             var deleteQuery = `DELETE FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ?;`;
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할때
-                    console.log("DELETE /roomlist/userid error : 서버 이용자가 너무 많습니다.");
+                    console.log("POST /roomlist/deluser error : 서버 이용자가 너무 많습니다.");
                     connection.release();
-                    next(new Error('DELETE /roomlist/userid error:3'));
-                } else {
-                    connection.query(deleteQuery, [req.params.userID, req.params.roomID], (sqlErr) => {
+                    next(new Error('POST /roomlist/deluser error:3'));
+                } else { 
+                    connection.query(deleteQuery, [req.body.userID, req.body.roomID], (sqlErr) => {
                         if (sqlErr) {
                             // TODO : sql 내부 에러 처리
                             connection.release();
-                            console.log("DELETE /roomlist/userid error : SQL 내부 에러. query를 확인해 주세요.");
-                            next(new Error('DELETE /roomlist/userid error:4'));
+                            console.log("POST /roomlist/deluser error : SQL 내부 에러. query를 확인해 주세요.");
+                            next(new Error('POST /roomlist/deluser error:4'));
                         } else {
                             console.log("삭제 완료");
                             res.status(200).end();
