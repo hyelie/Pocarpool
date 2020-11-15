@@ -14,6 +14,7 @@ var authRouter = require('./routes/auth');
 var roomlistRouter = require('./routes/roomlist');
 var reportRouter = require('./routes/report');
 var chatRouter = require('./routes/chat');
+const { join } = require('path');
 var chatActivity = require('./routes/socket').chatActivity;
 
 var app = express();
@@ -57,6 +58,8 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
+
+
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -70,3 +73,5 @@ app.use(function(err, req, res, next) {
 
 module.exports = app;
 // node ./bin/www를 하면 실행됨.
+
+

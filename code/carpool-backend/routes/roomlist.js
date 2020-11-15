@@ -11,7 +11,7 @@ var pool = require('../db/initiate').pool;
 router.get('/', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.user == undefined) {
-        console.log("login error")
+        console.log("login error");
         next(new Error('GET /roomlist error:0'));
     }
     else {
@@ -27,33 +27,33 @@ router.get('/', function (req, res, next) {
         // 3. 사용자에게 json 형식으로 출력하기
 
         // 1. MySql query문 만들기
-        var element = []
-        var property = ``
-        property = property + ((req.query.depart_place != undefined) ? `depart_place=?` : ``)
+        var element = [];
+        var property = ``;
+        property = property + ((req.query.depart_place != undefined) ? `depart_place=?` : ``);
         if (req.query.depart_place != undefined) { element.push(depart_place) }
-        property = property + ((property != `` && req.query.arrive_place != undefined) ? ` AND ` : ``) + ((req.query.arrive_place != undefined) ? `arrive_place=?` : ``)
+        property = property + ((property != `` && req.query.arrive_place != undefined) ? ` AND ` : ``) + ((req.query.arrive_place != undefined) ? `arrive_place=?` : ``);
         if (req.query.depart_place != undefined) { element.push(arrive_place) }
-        property = property + ((property != `` && req.query.depart_time != undefined) ? ` AND ` : ``) + ((req.query.depart_time != undefined) ? `depart_time=?` : ``)
+        property = property + ((property != `` && req.query.depart_time != undefined) ? ` AND ` : ``) + ((req.query.depart_time != undefined) ? `depart_time=?` : ``);
         if (req.query.depart_place != undefined) { element.push(depart_time) }
-        property = property + ((property != `` && req.query.arrive_time != undefined) ? ` AND ` : ``) + ((req.query.arrive_time != undefined) ? `arrive_time=?` : ``)
+        property = property + ((property != `` && req.query.arrive_time != undefined) ? ` AND ` : ``) + ((req.query.arrive_time != undefined) ? `arrive_time=?` : ``);
         if (req.query.depart_place != undefined) { element.push(arrive_time) }
 
 
         // 쿼리 완성
         if (property == ``) {
-            var sql = `SELECT * FROM carpooldb.roominfos`
+            var sql = `SELECT * FROM pocarpool.roominfos`;
         }
         else {
-            var sql = `SELECT * FROM carpooldb.roominfos WHERE ${property}`
+            var sql = `SELECT * FROM pocarpool.roominfos WHERE ${property}`;
         }
         pool.getConnection(function (err, connection) {
             if (!err) {
                 connection.query(sql, element, (err, rows, fields) => {
-                    console.log("error",err)
+                    console.log("error",err);
                     if (err) throw err;
-                    console.log(rows)
+                    console.log(rows);
 
-                    res.json(rows) // 3. 사용자에게 json 형식으로 출력하기
+                    res.json(rows); // 3. 사용자에게 json 형식으로 출력하기
                     res.status(200);
                 });
             }
@@ -72,12 +72,12 @@ router.post('/', (req, res, next) => {
         next(new Error('POST /roomlist error:0'));
     }
     else {
-        console.log(req.body)
-        car_type = req.body.car_type
-        depart_place = req.body.depart_place
-        arrive_place = req.body.arrive_place
-        depart_time = req.body.depart_time
-        arrive_time = req.body.arrive_time
+        console.log(req.body);
+        car_type = req.body.car_type;
+        depart_place = req.body.depart_place;
+        arrive_place = req.body.arrive_place;
+        depart_time = req.body.depart_time;
+        arrive_time = req.body.arrive_time;
 
         // 시간 검사용 정규표현식
         var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
@@ -90,7 +90,7 @@ router.post('/', (req, res, next) => {
             // 1. MySql query문 만들기
             //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
             //시간: 2020-07-29 14:10:23 형태를 한다
-            var sql = `INSERT INTO carpooldb.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,0,0,0,0,0,NOW())`;
+            var sql = `INSERT INTO pocarpool.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,0,0,0,0,0,NOW())`;
 
             pool.getConnection(function (err1, connection) {
                 if (!err1) {
@@ -125,7 +125,7 @@ router.put('/', (req, res, next) => {
             next(new Error('PUT /roomlist error:1'));
         } else {
             // query 생성
-            var updateQuery = "UPDATE carpoolDB.roominfos SET";
+            var updateQuery = "UPDATE pocarpool.roominfos SET";
             var roomCol = ["car_type", "depart_place", "arrive_place", "depart_time", "arrive_time", "current_headcount", "total_headcount", "current_carrier_num", "total_carrier_num", "isConfirm", "confirm_time"];
             console.log(roomCol, '\n', updateData);
             var notNULLcolumn = new Array();
@@ -177,7 +177,8 @@ router.post('/delete', (req, res, next) => {
     } else {
         // DELETE FROM tablename WHERE condition;
         // 값 삭제
-        var deleteQuery = `DELETE FROM carpoolDB.roominfos WHERE id=?; DELETE FROM carpoolDB.users_and_rooms_infos WHERE roomId = ?`;
+        var deleteQuery = `DELETE FROM pocarpool.roominfos WHERE id=?; DELETE FROM pocarpool.users_and_rooms_infos WHERE roomId = ?
+                            DELETE FROM pocarpool.messages WHERE roomID=?`;
         pool.getConnection(function (err, connection) {
             if (err) {
                 // TODO : DB에 접근 못 할때
@@ -185,7 +186,7 @@ router.post('/delete', (req, res, next) => {
                 console.log("POST /roomlist/delete error : 서버 이용자가 너무 많습니다.");
                 next(new Error('POST /roomlist/delete error:3'));
             } else {
-                connection.query(deleteQuery, [req.body.roomID, req.body.roomID], (sqlErr) => {
+                connection.query(deleteQuery, [req.body.roomID, req.body.roomID, req.body.roomID], (sqlErr) => {
                     if (sqlErr) {
                         // TODO : sql 내부 에러 처리
                         console.log("POST /roomlist/delete error : SQL 내부 에러. query를 확인해 주세요. 해당하는 방이 없습니다.");
@@ -220,7 +221,7 @@ router.post('/getroom', function (req, res, next) {
         } else {
             // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
             var belongQuery = `SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount,
-            current_carrier_num, total_carrier_num, isConfirm, confirm_time FROM carpooldb.roominfos INNER JOIN carpooldb.users_and_rooms_infos
+            current_carrier_num, total_carrier_num, isConfirm, confirm_time FROM pocarpool.roominfos INNER JOIN pocarpool.users_and_rooms_infos
             ON roominfos.id = users_and_rooms_infos.roomID WHERE users_and_rooms_infos.userid = ? ORDER BY depart_time ASC;`;
 
             pool.getConnection(function (err, connection) {
@@ -264,10 +265,10 @@ router.post('/adduser', function (req, res, next) {
             next(new Error('POST /roomlist/adduser error:2'));
         } else {
             // query
-            var addUsersRoomQuery = `INSERT INTO carpooldb.users_and_rooms_infos (userID, roomID) SELECT ?, ? FROM dual
-                                        WHERE EXISTS (SELECT carpooldb.users.id FROM carpooldb.users WHERE carpooldb.users.id = ? LIMIT 1)
-                                        AND EXISTS (SELECT roominfos.id FROM carpooldb.roominfos WHERE roominfos.id = ? LIMIT 1)
-                                        AND NOT EXISTS (SELECT * FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ? LIMIT 1);`;
+            var addUsersRoomQuery = `INSERT INTO pocarpool.users_and_rooms_infos (userID, roomID) SELECT ?, ? FROM dual
+                                        WHERE EXISTS (SELECT pocarpool.users.id FROM pocarpool.users WHERE pocarpool.users.id = ? LIMIT 1)
+                                        AND EXISTS (SELECT roominfos.id FROM pocarpool.roominfos WHERE roominfos.id = ? LIMIT 1)
+                                        AND NOT EXISTS (SELECT * FROM pocarpool.users_and_rooms_infos WHERE userid = ? AND roomid = ? LIMIT 1);`;
             var userID = req.body.userID;
             var roomID = req.body.roomID;
             pool.getConnection(function (err, connection) {
@@ -309,7 +310,7 @@ router.post('/deluser', (req, res, next) => {
             // TODO : 접근 권한 오류
             next(new Error('POST /roomlist/deluser error:2'));
         } else {
-            var deleteQuery = `DELETE FROM carpooldb.users_and_rooms_infos WHERE userid = ? AND roomid = ?;`;
+            var deleteQuery = `DELETE FROM pocarpool.users_and_rooms_infos WHERE userid = ? AND roomid = ?;`;
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할때

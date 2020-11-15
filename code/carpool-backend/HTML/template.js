@@ -1,3 +1,5 @@
+var pool = require('../db/initiate').pool;
+
 exports.template = {
     register: `
     <!doctype html>
