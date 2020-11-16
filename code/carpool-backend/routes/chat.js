@@ -20,9 +20,9 @@ router.post('/getmsg', function(req, res, next){
     
 
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+/*     if (req.user == undefined) {
         next(new Error('POST /chat/getmsg error:0'));
-    } else {
+    } else { */
         console.log("문제가 뭔자");
             // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
             var msgQuery = `SELECT pocarpool.messages.roomID, pocarpool.messages.sendTime, pocarpool.messages.sendUserID, pocarpool.messages.chat_content
@@ -57,7 +57,7 @@ router.post('/getmsg', function(req, res, next){
                 connection.release();
                 console.log(pool._freeConnections.indexOf(connection));
             });
-        }
+        //}
     });
 
 // 오류 처리기
