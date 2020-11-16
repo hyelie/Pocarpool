@@ -67,11 +67,9 @@ var initQuery = {
 }
 
 exports.pool = mysql.createPool({
-  host : 'pocarpool.poapper.com',
+  host : 'localhost',
   user : 'poapper',
   password : 'djffls><akdrh123',
-  //host : 'localhost',
-  //user : 'root',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
