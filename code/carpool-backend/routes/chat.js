@@ -15,8 +15,8 @@ router.get('/', function(req, res, next) {
 // POST /chat/getmsg
 router.post('/getmsg', function(req, res, next){
 
-    var time = req.datetime;
-    var userID = req.userID;
+    var time = req.body.datetime;
+    var userID = req.body.userID;
     
 
     // TODO : 로그인 에러
