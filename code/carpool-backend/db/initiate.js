@@ -50,29 +50,18 @@ var initQuery = {
     sendTime          DATETIME    NOT NULL,
     sendUserID        INT(11)     NOT NULL,
     chat_content      TEXT        NOT NULL,
-    PRIMARY KEY(roomID, sendTime)
+    PRIMARY KEY(roomID, sendTime, sendUserID)
   );
-  SET GLOBAL event_scheduler = ON;
-  DELEMITER $$
-    DROP PROCEDURE IF EXISTS event_delete_room$$
-    CREATE PROCEDURE event_delete_room()
-      BEGIN
-        DECLARE i INT DEFAULT (SELECT IFNULL(pocarpool.roominfos.id, -1) FROM pocarpool.roominfos WHERE pocarpool.roominfos.confirm_time > DATE_ADD(pocarpool.roominfos.confirm_time, INTERVAL 3 MONTH) LIMIT 1);
-        SET SQL_SAFE_UPDATES=0;
-        while(i != -1) DO
-          DELETE FROM pocarpool.users_and_rooms_infos WHERE id = i;
-          DELETE FROM pocarpool.messages WHERE roomID = i;
-          DELETE FROM pocarpool.roominfos WHERE id=i;
-          SET i = SELECT IFNULL(pocarpool.roominfos.roomID, -1) FROM pocarpool.roominfos WHERE pocarpool.roominfos.confirm_time > DATE_ADD(pocarpool.roominfos.confirm_time, INTERVAL 3 MONTH) LIMIT 1;
-        END WHILE
-      END $$
-    DELEMITER $$
-
-  CREATE EVENT event_delete_room
-    ON SCHEDULE every 1 day
-    STARTS '2020-12-01 00:00:00'
-    COMMENT '매일 1회 0시에 시작하는 오래된 방 삭제 프로시져'
-    DO event_delete_room()
+  USE pocarpool;
+  DROP EVENT IF EXISTS event_clear_overdue;
+  CREATE EVENT IF NOT EXISTS event_clear_overdue
+    ON SCHEDULE EVERY 1 DAY
+    STARTS '2020-11-16 00:00:00'
+    COMMENT "delete overdue room and it's data for once a day"
+    DO DELETE m, r, ur FROM pocarpool.roominfos AS r
+        INNER JOIN pocarpool.users_and_rooms_infos AS ur ON r.id = ur.roomid
+        INNER JOIN pocarpool.messages AS m ON m.roomID = r.id
+        WHERE NOW() > DATE_ADD(r.confirm_time, INTERVAL 60 DAY);
   `,
   chatlog_rearrange : `ALTER TABLE chatlogs AUTO_INCREMENT=1; SET @COUNT=0; UPDATE chatlogs SET id = @COUNT:=@COUNT+1;`
 }
@@ -123,3 +112,71 @@ exports.exeQuery = {
 
   }
 }
+
+/* 
+
+INSERT INTO pocarpool.roominfos
+(id, car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time)
+VALUES
+(1, "자가용", "1번", "1번", "2020-11-16 03:09:00", "2020-11-16 03:09:00", 1, 1, 1, 1, 1, "2020-11-16 03:09:00");
+
+INSERT INTO pocarpool.users_and_rooms_infos
+(userID, roomID)
+VALUES
+(1, 1);
+
+INSERT INTO pocarpool.users_and_rooms_infos
+(userID, roomID)
+VALUES
+(1, 2);
+
+INSERT INTO pocarpool.users_and_rooms_infos
+(userID, roomID)
+VALUES
+(2, 1);
+
+INSERT INTO pocarpool.users_and_rooms_infos
+(userID, roomID)
+VALUES
+(2, 2);
+
+select r.id, r.confirm_time FROM roominfos AS r;
+
+select * from messages;
+
+select * from users_and_rooms_infos;
+
+
+
+
+
+
+
+
+
+
+
+
+  SET GLOBAL event_scheduler = ON;
+  USE pocarpool;
+  DELIMITER $$
+    DROP PROCEDURE IF EXISTS event_delete_room;
+    CREATE PROCEDURE event_delete_room()
+    BEGIN
+      SET SQL_SAFE_UPDATES=0;
+      DELETE m, r, ur FROM pocarpool.roominfos AS r
+        INNER JOIN pocarpool.users_and_rooms_infos AS ur ON r.id = ur.roomid
+        INNER JOIN pocarpool.messages AS m ON m.roomID = r.id
+        WHERE NOW() > DATE_ADD(r.confirm_time, INTERVAL 3 MONTH);
+    END$$
+  DELIMITER ;
+
+  CREATE EVENT IF NOT EXISTS event_clear_overdue
+    ON SCHEDULE every 1 day
+    STARTS '2020-12-01 00:00:00'
+    COMMENT '매일 1회 0시에 시작하는 오래된 방 삭제 프로시져'
+    DO DELETE m, r, ur FROM pocarpool.roominfos AS r
+        INNER JOIN pocarpool.users_and_rooms_infos AS ur ON r.id = ur.roomid
+        INNER JOIN pocarpool.messages AS m ON m.roomID = r.id
+        WHERE NOW() > DATE_ADD(r.confirm_time, INTERVAL 3 MONTH);
+*/

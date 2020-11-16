@@ -113,18 +113,18 @@ exports.template = {
         const name = prompt('What your name');
         const socket = io();
         let room = ['room1', 'room2'];
-        let num = 0;
+        let num = 1;
     
         socket.emit('joinRoom', num, name);
     
         $('select').change(() => {
           socket.emit('leaveRoom', num, name);
           num++;
-          num = num % 2;
+          num = num % 2; num++;
           socket.emit('joinRoom', num, name);
         });
     
-    
+        
         $('form').submit(() => {
           socket.emit('chat message', num, name, $('#m').val());
           $('#m').val('');
