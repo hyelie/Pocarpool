@@ -73,7 +73,7 @@ exports.pool = mysql.createPool({
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
-  //socketPath: '/var/run/mysqld/mysqld.sock'
+  socketPath: '/var/run/mysqld/mysqld.sock'
 });  
 
 exports.checkQuery = {
