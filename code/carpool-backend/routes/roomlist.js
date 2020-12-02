@@ -79,7 +79,7 @@ router.post('/', (req, res, next) => {
         depart_time = req.body.depart_time;
         arrive_time = req.body.arrive_time;
         current_headcount = req.body.current_headcount;
-        total_headcount = req.body.total_headcountl;
+        total_headcount = req.body.total_headcount;
         current_carrier_num = req.body.current_carrier_num;
         total_carrier_num = req.body.total_carrier_num;
 
