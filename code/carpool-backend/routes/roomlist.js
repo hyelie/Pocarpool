@@ -78,6 +78,10 @@ router.post('/', (req, res, next) => {
         arrive_place = req.body.arrive_place;
         depart_time = req.body.depart_time;
         arrive_time = req.body.arrive_time;
+        current_headcount = req.body.current_headcount;
+        total_headcount = req.body.total_headcountl;
+        current_carrier_num = req.body.current_carrier_num;
+        total_carrier_num = req.body.total_carrier_num;
 
         // 시간 검사용 정규표현식
         var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
@@ -90,11 +94,11 @@ router.post('/', (req, res, next) => {
             // 1. MySql query문 만들기
             //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
             //시간: 2020-07-29 14:10:23 형태를 한다
-            var sql = `INSERT INTO pocarpool.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,0,0,0,0,0,NOW())`;
+            var sql = `INSERT INTO pocarpool.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,?,?,?,?,0,NOW())`;
 
             pool.getConnection(function (err1, connection) {
                 if (!err1) {
-                    connection.query(sql, [car_type, depart_place, arrive_place, depart_time, arrive_time], (err2, rows, fields) => {
+                    connection.query(sql, [car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num], (err2, rows, fields) => {
                         if (err2) throw err2;
                     });
                 }
