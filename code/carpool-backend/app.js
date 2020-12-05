@@ -6,8 +6,6 @@ const bodyParser = require('body-parser');
 var logger = require('morgan');
 
 const session = require('express-session');
-const passport = require('passport');
-const passportConfig = require('./passport/passport');
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
@@ -16,6 +14,9 @@ var reportRouter = require('./routes/report');
 var chatRouter = require('./routes/chat');
 const { join } = require('path');
 var chatActivity = require('./routes/socket').chatActivity;
+
+// var IsLogined = require('./auth/IsLogined');
+// var SSOredirect = require('./auth/SSOredirect');
 
 var app = express();
 
@@ -33,16 +34,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json({limit : '128kb'}));
 
 
-// 간단한 기능이기 때문에 대충 설정했음, passport 활성화
+// 간단한 기능이기 때문에 대충 설정했음
 app.use(session({
   secret: "noh02NOI1",
   resave: true,
   saveUninitialized: true,
   cookie: { maxAge: 3600000, httpOnly: true },
 }));
-app.use(passport.initialize());
-app.use(passport.session());
-passportConfig();
+
+// app.get("/auth/login_process",SSOredirect());
+// app.get("/auth/login", IsLogined);
+
 
 app.use('/', indexRouter);
 app.use('/auth', authRouter);

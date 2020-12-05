@@ -10,7 +10,8 @@ var initQuery = {
     report_num        INT(6)      DEFAULT 0 NOT NULL,
     isAdmin           BOOL        DEFAULT false NOT NULL,
     memberID          VARCHAR(20) NOT NULL UNIQUE,
-    memberPW          VARCHAR(20) NOT NULL,
+    memberEmail       VARCHAR(50) NOT NULL,
+    memberType        VARCHAR(20) NOT NULL,
     PRIMARY KEY(id)
   );  CREATE TABLE IF NOT EXISTS pocarpool.roominfos(
     id                    INT(11)     NOT NULL AUTO_INCREMENT,
@@ -69,7 +70,7 @@ var initQuery = {
 exports.pool = mysql.createPool({
   host : 'localhost',
   user : 'poapper',
-  password : 'djffls><akdrh123',
+  password : 'poapper',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
