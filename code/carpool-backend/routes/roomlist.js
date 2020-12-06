@@ -10,7 +10,7 @@ var pool = require('../db/initiate').pool;
 // depart_place, arrive_place, depart_time, arrive_time 총 4개를 Query로 받을 수 있다. (출발장소, 도착장소, 출발시간, 도착시간)
 router.get('/', function (req, res, next) {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         console.log("login error");
         next(new Error('GET /roomlist error:0'));
     }
@@ -68,7 +68,7 @@ router.get('/', function (req, res, next) {
 // (필수적으로) 입력 되는 값: car_type, depart_place, arrive_place, depart_time, arrive_time
 router.post('/', (req, res, next) => {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         next(new Error('POST /roomlist error:0'));
     }
     else {
@@ -114,7 +114,7 @@ router.post('/', (req, res, next) => {
 // PUT /roomlist
 router.put('/', (req, res, next) => {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         next(new Error('PUT /roomlist error:0'));
     } else {
         // UPDATE tablename SET column1 = value1, column2 = value2, ... WHERE condition
@@ -176,7 +176,7 @@ router.put('/', (req, res, next) => {
 // pass
 router.post('/delete', (req, res, next) => {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         next(new Error('POST /roomlist/delete error:0'));
     } else {
         // DELETE FROM tablename WHERE condition;
@@ -215,11 +215,11 @@ router.post('/delete', (req, res, next) => {
 // pass
 router.post('/getroom', function (req, res, next) {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         next(new Error('POST /roomlist/getroom error:0'));
     } else {
         // admin이 아닌데 다른 id로 접근하는 경우에는 에러
-        if (req.user.isAdmin == 0 && req.body.userID != req.user.id) {
+        if (req.session.user.isAdmin == 0 && req.body.userID != req.session.user.id) {
             // TODO : 접근 권한 오류
             next(new Error('POST /roomlist/getroom error:2'));
         } else {
@@ -261,10 +261,10 @@ router.post('/getroom', function (req, res, next) {
 // pass
 router.post('/adduser', function (req, res, next) {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         next(new Error('POST /roomlist/userid error:0'));
     } else {
-        if (req.body.userID != req.user.id) {
+        if (req.session.user.id == NULL) {
             // TODO : 접근 권한 오류
             next(new Error('POST /roomlist/adduser error:2'));
         } else {
@@ -273,7 +273,7 @@ router.post('/adduser', function (req, res, next) {
                                         WHERE EXISTS (SELECT pocarpool.users.id FROM pocarpool.users WHERE pocarpool.users.id = ? LIMIT 1)
                                         AND EXISTS (SELECT roominfos.id FROM pocarpool.roominfos WHERE roominfos.id = ? LIMIT 1)
                                         AND NOT EXISTS (SELECT * FROM pocarpool.users_and_rooms_infos WHERE userid = ? AND roomid = ? LIMIT 1);`;
-            var userID = req.body.userID;
+            var userID = req.session.user.id;
             var roomID = req.body.roomID;
             pool.getConnection(function (err, connection) {
                 if (err) {
@@ -307,10 +307,10 @@ router.post('/adduser', function (req, res, next) {
 // pass
 router.post('/deluser', (req, res, next) => {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         next(new Error('POST /roomlist/deluser error:0'));
     } else {l
-        if (req.user.isAdmin == 0 && req.body.userID != req.user.id) {
+        if (req.session.user.isAdmin == 0 && req.body.userID != req.session.user.id) {
             // TODO : 접근 권한 오류
             next(new Error('POST /roomlist/deluser error:2'));
         } else {

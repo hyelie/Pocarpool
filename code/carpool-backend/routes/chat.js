@@ -16,11 +16,11 @@ router.get('/', function(req, res, next) {
 router.post('/getmsg', function(req, res, next){
 
     var time = req.body.datetime;
-    var userID = req.body.userID;
+    var userID = req.session.user.userID;
     
 
     // TODO : 로그인 에러
-     if (req.user == undefined) {
+     if (req.session.user == undefined) {
         next(new Error('POST /chat/getmsg error:0'));
     } else {
         console.log("문제가 뭔자");

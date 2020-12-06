@@ -109,7 +109,7 @@ router.get('/', function (req, res, next) {
 // PUT /report?id=
 router.put('/', function (req, res, next) {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         console.log("login error")
         next(new Error('PUT /report error:0'));
     } else if (req.user.isAdmin == 0) {
@@ -145,10 +145,10 @@ router.put('/', function (req, res, next) {
 // DELETE /report?id=
 router.delete('/', function (req, res, next) {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         console.log("login error")
         next(new Error('DELETE /report error:0'));
-    } else if (req.user.isAdmin == 0) {
+    } else if (req.session.user.isAdmin == 0) {
         // TODO : 접근 권한 오류
         next(new Error('DELETE /report error:2'));
     } else {
