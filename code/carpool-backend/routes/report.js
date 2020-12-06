@@ -7,10 +7,10 @@ const router = express.Router();
 // POST /report
 router.post('/', function (req, res, next) {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         console.log("login error")
         next(new Error('POST /report error:0'));
-    } else if (req.user.isAdmin == 0) {
+    } else if (req.session.user.isAdmin == 0) {
         // TODO : 접근 권한 오류
         next(new Error('POST /report error:2'));
     } else {
@@ -58,10 +58,10 @@ router.post('/', function (req, res, next) {
 // GET /report?id=
 router.get('/', function (req, res, next) {
     // TODO : 로그인 에러
-    if (req.user == undefined) {
+    if (req.session.user == undefined) {
         console.log("login error")
         next(new Error('GET /report error:0'));
-    } else if (req.user.isAdmin == 0) {
+    } else if (req.session.user.isAdmin == 0) {
         // TODO : 접근 권한 오류
         next(new Error('GET /report error:2'));
     } else {
@@ -112,7 +112,7 @@ router.put('/', function (req, res, next) {
     if (req.session.user == undefined) {
         console.log("login error")
         next(new Error('PUT /report error:0'));
-    } else if (req.user.isAdmin == 0) {
+    } else if (req.session.user.isAdmin == 0) {
         // TODO : 접근 권한 오류
         next(new Error('PUT /report error:2'));
     } else {
