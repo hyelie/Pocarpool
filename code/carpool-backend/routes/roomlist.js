@@ -142,7 +142,7 @@ router.put('/', (req, res, next) => {
                 }
             }
             updateQuery = updateQuery.slice(0, -1) + ` WHERE id=?`
-            notNULLcolumn[j] = req.body.id;
+            notNULLcolumn[j] = req.body.roomID;
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할때
@@ -212,17 +212,14 @@ router.post('/delete', (req, res, next) => {
 
 // GET /roomlist/userid?userID=
 // -> POST /roomlist/getroom
+// -> GET /roomlist/getroom
 // pass
-router.post('/getroom', function (req, res, next) {
+router.get('/getroom', function (req, res, next) {
     // TODO : 로그인 에러
     if (req.session.user == undefined) {
         next(new Error('POST /roomlist/getroom error:0'));
     } else {
-        // admin이 아닌데 다른 id로 접근하는 경우에는 에러
-        if (req.session.user.isAdmin == 0 && req.body.userID != req.session.user.id) {
-            // TODO : 접근 권한 오류
-            next(new Error('POST /roomlist/getroom error:2'));
-        } else {
+       
             // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
             var belongQuery = `SELECT roominfos.id, car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount,
             current_carrier_num, total_carrier_num, isConfirm, confirm_time FROM pocarpool.roominfos INNER JOIN pocarpool.users_and_rooms_infos
@@ -231,17 +228,17 @@ router.post('/getroom', function (req, res, next) {
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할 때
-                    console.log("POST /roomlist/getroom error : 서버 이용자가 너무 많습니다.");
+                    console.log("GET /roomlist/getroom error : 서버 이용자가 너무 많습니다.");
                     connection.release();
-                    next(new Error('POST /roomlist/getroom error:3'));
+                    next(new Error('GET /roomlist/getroom error:3'));
                 } else {
-                    connection.query(belongQuery, [req.body.userID], (err, result) => {
+                    connection.query(belongQuery, [req.session.user.id], (err, result) => {
                         console.log(belongQuery);
                         if (err) {
                             // TODO : sql 내부 에러 처리
-                            console.log("POST /roomlist/getroom error : SQL 내부 에러. query를 확인해 주세요.");
+                            console.log("GET /roomlist/getroom error : SQL 내부 에러. query를 확인해 주세요.");
                             connection.release();
-                            next(new Error('POST /roomlist/getroom error:4'));
+                            next(new Error('GET /roomlist/getroom error:4'));
                         } else {
                             console.log("id에 해당하는 사람이 속해있는 방의 정보 출력", result);
                             res.json(result);
@@ -253,7 +250,7 @@ router.post('/getroom', function (req, res, next) {
                 connection.release();
                 console.log(pool._freeConnections.indexOf(connection));
             });
-        }
+        
     }
 });
 
@@ -309,11 +306,7 @@ router.post('/deluser', (req, res, next) => {
     // TODO : 로그인 에러
     if (req.session.user == undefined) {
         next(new Error('POST /roomlist/deluser error:0'));
-    } else {l
-        if (req.session.user.isAdmin == 0 && req.body.userID != req.session.user.id) {
-            // TODO : 접근 권한 오류
-            next(new Error('POST /roomlist/deluser error:2'));
-        } else {
+    } else {
             var deleteQuery = `DELETE FROM pocarpool.users_and_rooms_infos WHERE userid = ? AND roomid = ?;`;
             pool.getConnection(function (err, connection) {
                 if (err) {
@@ -322,7 +315,7 @@ router.post('/deluser', (req, res, next) => {
                     connection.release();
                     next(new Error('POST /roomlist/deluser error:3'));
                 } else { 
-                    connection.query(deleteQuery, [req.body.userID, req.body.roomID], (sqlErr) => {
+                    connection.query(deleteQuery, [req.session.user.id, req.body.roomID], (sqlErr) => {
                         if (sqlErr) {
                             // TODO : sql 내부 에러 처리
                             connection.release();
@@ -339,7 +332,7 @@ router.post('/deluser', (req, res, next) => {
                 console.log(pool._freeConnections.indexOf(connection));
             });
             res.end();
-        }
+        
     }
 });
 
