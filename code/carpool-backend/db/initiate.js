@@ -1,7 +1,6 @@
 var mysql = require('mysql');
 const { connect } = require('../app');
 
-// users table의 memberID, memberPW는 임시 값.
 var initQuery = {
   checkSchema : `CREATE DATABASE IF NOT EXISTS pocarpool; USE pocarpool;`,
   checkTable : `USE pocarpool; CREATE TABLE IF NOT EXISTS pocarpool.users(
@@ -9,7 +8,6 @@ var initQuery = {
     name              VARCHAR(20) NOT NULL,
     report_num        INT(6)      DEFAULT 0 NOT NULL,
     isAdmin           BOOL        DEFAULT false NOT NULL,
-    memberID          VARCHAR(20) NOT NULL UNIQUE,
     memberEmail       VARCHAR(50) NOT NULL,
     memberType        VARCHAR(20) NOT NULL,
     PRIMARY KEY(id)
@@ -69,13 +67,14 @@ var initQuery = {
 
 exports.pool = mysql.createPool({
   host : 'localhost',
-  user : 'poapper',
-  //password : 'poapper',
-  password : 'djffls><akdrh123',
+  user:'root',
+  password:'a23752666',
+  //user : 'poapper',
+  //password : 'djffls><akdrh123',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
-  socketPath: '/var/run/mysqld/mysqld.sock'
+  //socketPath: '/var/run/mysqld/mysqld.sock'
 });  
 
 exports.checkQuery = {

@@ -51,7 +51,8 @@ const ssoRedirect = () => {
                     var useremail = user_info["email"];
                     var userid = user_info["id"]; 
                     var usertype = user_info["type"];
-
+                    var userreportnum;
+                    var userisAdmin;
 
                     // 검증 성공시 db확인 후 서버 유저 등록
                     pool.getConnection(function(poolerr, connection){
@@ -63,19 +64,24 @@ const ssoRedirect = () => {
                             console.log("유저정보 확인", username, userid, useremail, usertype);
 
                             // 이미 db에 있는지 확인 후 db에 넣기
-                            var checkuserquery = `SELECT * FROM pocarpool.users WHERE memberID = (?);`;
+                            var checkuserquery = `SELECT * FROM pocarpool.users WHERE id = (?);`;
                             connection.query(checkuserquery, [userid], (err, results, fields) =>{
                                 
                                 // db에 존재하지 않는 경우에만 db에 추가
                                 if(results.length == 0){
-                                    var adduserquery = `INSERT INTO pocarpool.users(name, memberID, memberEmail, memberType) VALUES (?, ?, ?, ?)`;
-                                    connection.query(adduserquery, [username, userid,useremail , usertype], function (err, results, fields) {
+                                    var adduserquery = `INSERT INTO pocarpool.users(name, id, memberEmail, memberType, report_num, isAdmin) VALUES (?, ?, ?, ?, ?, ?)`;
+                                    connection.query(adduserquery, [username, userid, useremail , usertype, 0, 0], function (err, results, fields) {
                                         if (err) {
                                             console.log(err)
                                         } else {
                                             console.log("등록 완료~");
                                         }
                                     });
+                                }
+                                // db에 있는 경우 정보 꺼내옴
+                                else{
+                                    userreportnum = results.report_num;
+                                    userisAdmin = results.isAdmin;
                                 }
                             })
                         }
@@ -94,7 +100,9 @@ const ssoRedirect = () => {
                             id : userid,
                             name : username,
                             email : useremail,
-                            type : usertype
+                            type : usertype,
+                            report_num : userreportnum,
+                            isAdmin : userisAdmin
                         }
                     }
 

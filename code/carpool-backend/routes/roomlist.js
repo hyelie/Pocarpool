@@ -181,7 +181,7 @@ router.post('/delete', (req, res, next) => {
     } else {
         // DELETE FROM tablename WHERE condition;
         // 값 삭제
-        var deleteQuery = `DELETE FROM pocarpool.roominfos WHERE id=?; DELETE FROM pocarpool.users_and_rooms_infos WHERE roomId = ?
+        var deleteQuery = `DELETE FROM pocarpool.roominfos WHERE id=?; DELETE FROM pocarpool.users_and_rooms_infos WHERE roomID = ?
                             DELETE FROM pocarpool.messages WHERE roomID=?`;
         pool.getConnection(function (err, connection) {
             if (err) {
@@ -251,7 +251,6 @@ router.get('/getroom', function (req, res, next) {
                 connection.release();
                 console.log(pool._freeConnections.indexOf(connection));
             });
-        
     }
 });
 

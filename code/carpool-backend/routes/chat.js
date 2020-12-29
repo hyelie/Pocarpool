@@ -4,7 +4,6 @@ var template = require('../HTML/template').template;
 var pool = require('../db/initiate').pool;
 
 // home
-// post 방식. req.body에 roomID, sendTime, sendUserID, chat_content가 들어있다.
 router.get('/', function(req, res, next) {
     
     res.send(template.chat);
@@ -13,12 +12,12 @@ router.get('/', function(req, res, next) {
 });
 
 // POST /chat/getmsg
+// post 방식. req.body에 roomID, sendTime, sendUserID, chat_content가 들어있다.
 router.post('/getmsg', function(req, res, next){
 
     var time = req.body.datetime;
     var userID = req.session.user.userID;
     
-
     // TODO : 로그인 에러
      if (req.session.user == undefined) {
         next(new Error('POST /chat/getmsg error:0'));
