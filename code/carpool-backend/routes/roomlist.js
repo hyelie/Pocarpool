@@ -5,9 +5,55 @@ const router = express.Router();
 var pool = require('../db/initiate').pool;
 // 미구현된 부분은 TODO : task의 형식으로 달았다.
 
-router.post('/check', function(req, res, next){
-    console.log("in here");
-})
+
+
+// POST /roomlist
+// (필수적으로) 입력 되는 값: car_type, depart_place, arrive_place, depart_time, arrive_time
+router.post('/', (req, res, next) => {
+    console.log("post /roomlist in");
+    // TODO : 로그인 에러
+    if (req.session.user == undefined) {
+        next(new Error('POST /roomlist error:0'));
+    }
+    else {
+        console.log(req.body);
+        car_type = req.body.car_type;
+        depart_place = req.body.depart_place;
+        arrive_place = req.body.arrive_place;
+        depart_time = req.body.depart_time;
+        arrive_time = req.body.arrive_time;
+        current_headcount = req.body.current_headcount;
+        total_headcount = req.body.total_headcount;
+        current_carrier_num = req.body.current_carrier_num;
+        total_carrier_num = req.body.total_carrier_num;
+
+        // 시간 검사용 정규표현식
+        var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
+        // 오류처리
+        if ((car_type != "자가용" && car_type != "택시") || depart_place == undefined || arrive_place == undefined || !regExp.test(depart_time) || !regExp.test(arrive_time)) {
+            next(new Error('POST /roomlist error:1'));
+        }
+        else {
+            // 1. MySql query문 만들기
+            //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
+            //시간: 2020-07-29 14:10:23 형태를 한다
+            var sql = `INSERT INTO pocarpool.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,?,?,?,?,0,NOW())`;
+
+            pool.getConnection(function (err1, connection) {
+                if (!err1) {
+                    connection.query(sql, [car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num], (err2, rows, fields) => {
+                        if (err2) throw err2;
+                    });
+                }
+                console.log(pool._freeConnections.indexOf(connection));
+                connection.release();
+                console.log(pool._freeConnections.indexOf(connection));
+            });
+            res.status(200).end();
+        }
+    }
+});
 
 // GET /roomlist
 // GET /roomlist? 
@@ -66,54 +112,6 @@ router.get('/', function (req, res, next) {
             connection.release();
             console.log(pool._freeConnections.indexOf(connection));
         });
-    }
-});
-
-// POST /roomlist
-// (필수적으로) 입력 되는 값: car_type, depart_place, arrive_place, depart_time, arrive_time
-router.post('/', (req, res, next) => {
-    console.log("post /roomlist in");
-    // TODO : 로그인 에러
-    if (req.session.user == undefined) {
-        next(new Error('POST /roomlist error:0'));
-    }
-    else {
-        console.log(req.body);
-        car_type = req.body.car_type;
-        depart_place = req.body.depart_place;
-        arrive_place = req.body.arrive_place;
-        depart_time = req.body.depart_time;
-        arrive_time = req.body.arrive_time;
-        current_headcount = req.body.current_headcount;
-        total_headcount = req.body.total_headcount;
-        current_carrier_num = req.body.current_carrier_num;
-        total_carrier_num = req.body.total_carrier_num;
-
-        // 시간 검사용 정규표현식
-        var regExp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-
-        // 오류처리
-        if ((car_type != "자가용" && car_type != "택시") || depart_place == undefined || arrive_place == undefined || !regExp.test(depart_time) || !regExp.test(arrive_time)) {
-            next(new Error('POST /roomlist error:1'));
-        }
-        else {
-            // 1. MySql query문 만들기
-            //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
-            //시간: 2020-07-29 14:10:23 형태를 한다
-            var sql = `INSERT INTO pocarpool.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,?,?,?,?,0,NOW())`;
-
-            pool.getConnection(function (err1, connection) {
-                if (!err1) {
-                    connection.query(sql, [car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num], (err2, rows, fields) => {
-                        if (err2) throw err2;
-                    });
-                }
-                console.log(pool._freeConnections.indexOf(connection));
-                connection.release();
-                console.log(pool._freeConnections.indexOf(connection));
-            });
-            res.status(200).end();
-        }
     }
 });
 
