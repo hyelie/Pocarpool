@@ -243,7 +243,7 @@ router.get('/getroom', function (req, res, next) {
                             connection.release();
                             next(new Error('GET /roomlist/getroom error:4'));
                         } else {
-                            console.log("id에 해당하는 사람이 속해있는 방의 정보 출력", result);
+                            console.log("id에 해당하는 사람이 속해있는 방의 정보 출력", result, req.session.user.id);
                             res.json(result);
                             res.status(200);
                         }
