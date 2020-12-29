@@ -69,13 +69,13 @@ router.get('/', function (req, res, next) {
         var getQuery, variable;
         if(req.query.id == undefined){
             // 목록 출력
-            getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime
+            getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName,  reports.reportReason, reports.isWorkDone, reports.reportTime
                             FROM pocarpool.reports INNER JOIN pocarpool.users ON reports.accuseUserID = users.id
                             ORDER BY reportTime asc LIMIT ?, 20;`;
             variable = (req.query.page-1) * 20;
         } else{
             // reportUserID에 해당하는 신고 세부 내용(채팅)
-            getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime, chatlogs.chat_content
+            getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName,  reports.reportReason, reports.isWorkDone, reports.reportTime, chatlogs.chat_content
                             FROM pocarpool.reports
                                 INNER JOIN pocarpool.users ON reports.accuseUserID = users.id
                                 INNER JOIN pocarpool.chatlogs ON chatlogs.reportID = reports.id
