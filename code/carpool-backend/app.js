@@ -8,7 +8,7 @@ var logger = require('morgan');
 const session = require('express-session');
 
 var indexRouter = require('./routes/index');
-var authRouter = require('./routes/auth');
+//var authRouter = require('./routes/auth');
 var roomlistRouter = require('./routes/roomlist');
 var reportRouter = require('./routes/report');
 var chatRouter = require('./routes/chat');
@@ -47,7 +47,7 @@ app.use(session({
 
 
 app.use('/', indexRouter);
-app.use('/auth', authRouter);
+//app.use('/auth', authRouter);
 app.use('/roomlist', roomlistRouter);
 app.use('/report', reportRouter);
 app.use('/chat', chatRouter);
