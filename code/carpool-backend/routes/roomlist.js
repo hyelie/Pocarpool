@@ -1,5 +1,5 @@
 const express = require('express');
-const { connect } = require('./auth');
+//const { connect } = require('./auth');
 const { PayloadTooLarge } = require('http-errors');
 const router = express.Router();
 var pool = require('../db/initiate').pool;
