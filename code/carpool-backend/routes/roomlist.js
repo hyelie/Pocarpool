@@ -5,6 +5,10 @@ const router = express.Router();
 var pool = require('../db/initiate').pool;
 // 미구현된 부분은 TODO : task의 형식으로 달았다.
 
+router.post('/check', function(req, res, next){
+    console.log("in here");
+})
+
 // GET /roomlist
 // GET /roomlist? 
 // depart_place, arrive_place, depart_time, arrive_time 총 4개를 Query로 받을 수 있다. (출발장소, 도착장소, 출발시간, 도착시간)
