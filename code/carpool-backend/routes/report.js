@@ -72,7 +72,7 @@ router.get('/', function (req, res, next) {
             getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime
                             FROM pocarpool.reports INNER JOIN pocarpool.users ON reports.accuseUserID = users.id
                             ORDER BY reportTime asc LIMIT ?, 20;`;
-            variable = req.query.page==undefined? 20 : (req.query.page-1) * 20;
+            variable = (req.query.page-1) * 20;
         } else{
             // reportUserID에 해당하는 신고 세부 내용(채팅)
             getQuery = `SELECT reports.id, reports.roomID, reports.reportUserID, reports.accuseUserID, users.name AS accuseName, users.memberID AS accuseMemberID, reports.reportReason, reports.isWorkDone, reports.reportTime, chatlogs.chat_content

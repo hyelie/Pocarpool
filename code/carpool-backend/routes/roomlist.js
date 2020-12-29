@@ -67,6 +67,7 @@ router.get('/', function (req, res, next) {
 // POST /roomlist
 // (필수적으로) 입력 되는 값: car_type, depart_place, arrive_place, depart_time, arrive_time
 router.post('/', (req, res, next) => {
+    console.log("post /roomlist in");
     // TODO : 로그인 에러
     if (req.session.user == undefined) {
         next(new Error('POST /roomlist error:0'));
