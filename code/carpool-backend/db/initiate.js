@@ -67,14 +67,12 @@ var initQuery = {
 
 exports.pool = mysql.createPool({
   host : 'localhost',
-  user:'root',
-  password:'a23752666',
-  //user : 'poapper',
-  //password : 'djffls><akdrh123',
+  user : 'poapper',
+  password : 'djffls><akdrh123',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
-  //socketPath: '/var/run/mysqld/mysqld.sock'
+  socketPath: '/var/run/mysqld/mysqld.sock'
 });  
 
 exports.checkQuery = {
