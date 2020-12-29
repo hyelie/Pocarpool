@@ -49,6 +49,7 @@ router.get('/', function (req, res, next) {
         pool.getConnection(function (err, connection) {
             if (!err) {
                 connection.query(sql, element, (err, rows, fields) => {
+                    console.log("here eerr");
                     console.log("error",err);
                     if (err) throw err;
                     console.log(rows);
