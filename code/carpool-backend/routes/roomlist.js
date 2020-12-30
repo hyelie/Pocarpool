@@ -77,16 +77,35 @@ router.get('/', function (req, res, next) {
         // 3. 사용자에게 json 형식으로 출력하기
 
         // 1. MySql query문 만들기
-        var element = [];
+        var element = {};
+        var queryelement = [];
         var property = ``;
-        property = property + ((req.query.depart_place != undefined) ? `depart_place=?` : ``);
-        if (req.query.depart_place != undefined) { element.push(depart_place) }
-        property = property + ((property != `` && req.query.arrive_place != undefined) ? ` AND ` : ``) + ((req.query.arrive_place != undefined) ? `arrive_place=?` : ``);
-        if (req.query.depart_place != undefined) { element.push(arrive_place) }
-        property = property + ((property != `` && req.query.depart_time != undefined) ? ` AND ` : ``) + ((req.query.depart_time != undefined) ? `depart_time=?` : ``);
-        if (req.query.depart_place != undefined) { element.push(depart_time) }
-        property = property + ((property != `` && req.query.arrive_time != undefined) ? ` AND ` : ``) + ((req.query.arrive_time != undefined) ? `arrive_time=?` : ``);
-        if (req.query.depart_place != undefined) { element.push(arrive_time) }
+        if (req.query.depart_place != undefined) {
+            element['depart_place'] = req.query.depart_place;
+            queryelement.push(req.query.depart_place);
+        }
+        if (req.query.arrive_place != undefined) {
+            element['arrive_place'] = req.query.arrive_place;
+            queryelement.push(req.query.arrive_place);
+        }
+        if (req.query.depart_time != undefined) {
+            element['depart_time'] = req.query.depart_time;
+            queryelement.push(req.query.depart_time);
+        }
+        if (req.query.arrive_time != undefined) {
+            element['arrive_time'] = req.query.arrive_time;
+            queryelement.push(req.query.arrive_time);
+        }
+
+        for(let key in element){
+            property += `${key}=? AND `
+        }
+        if(element != {}){
+            property = property.slice(0, property.length-4);
+        }
+
+        console.log(`property : ${property}, queryelement : ${queryelement}\n`)
+        
 
 
         // 쿼리 완성
@@ -98,7 +117,7 @@ router.get('/', function (req, res, next) {
         }
         pool.getConnection(function (err, connection) {
             if (!err) {
-                connection.query(sql, element, (err, rows, fields) => {
+                connection.query(sql, queryelement, (err, rows, fields) => {
                     console.log("here eerr");
                     console.log("error",err);
                     if (err) throw err;
@@ -118,6 +137,7 @@ router.get('/', function (req, res, next) {
 // PUT /roomlist
 router.put('/', (req, res, next) => {
     // TODO : 로그인 에러
+    console.log("put in\n");
     if (req.session.user == undefined) {
         next(new Error('PUT /roomlist error:0'));
     } else {
@@ -129,7 +149,9 @@ router.put('/', (req, res, next) => {
         // depart_time이 defined일 때 정규표현식에서 틀리거나
         // arrive_time이 defined일 때 정규표현식에서 틀리거나
         // isConfirmTime이 defined일 때 정규표현식에서 틀리거나.
-        if (updateData.every((value) => { return value == undefined ? 1 : 0; }) || (updateData[3] != undefined && !regExp.test(updateData[3])) || (updateData[4] != undefined && !regExp.test(updateData[4])) || (updateData[10] != undefined && !regExp.test(updateData[10])) || req.body.id == undefined) {
+        console.log(updateData);
+        if (updateData.every((value) => { return value == undefined ? 1 : 0; }) || (updateData[3] != undefined && !regExp.test(updateData[3])) || (updateData[4] != undefined && !regExp.test(updateData[4])) || (updateData[10] != undefined && !regExp.test(updateData[10])) || req.body.roomID == undefined) {
+            console.log("1 : %d\n, 2 : %d\n, 3 : %d\n, 4 : %d\n, 5 : %d\n", updateData.every((value) => { return value == undefined ? 1 : 0; }), (updateData[3] != undefined && !regExp.test(updateData[3])), (updateData[4] != undefined && !regExp.test(updateData[4])), (updateData[10] != undefined && !regExp.test(updateData[10])), req.body.roomID == undefined);
             next(new Error('PUT /roomlist error:1'));
         } else {
             // query 생성
@@ -138,14 +160,16 @@ router.put('/', (req, res, next) => {
             console.log(roomCol, '\n', updateData);
             var notNULLcolumn = new Array();
             var j = 0;
-            console.log(updateData.length);
+            console.log("updatedata : ", updateData, updateData.length);
             for (var i = 0; i < updateData.length; i++) {
                 if (updateData[i] != undefined) {
                     updateQuery = updateQuery + " " + roomCol[i] + "=?,";
                     notNULLcolumn[j] = updateData[i]; j++;
                 }
             }
+            console.log(`updateQuery : ${updateQuery}, notnulcollum : ${notNULLcolumn}\n`);
             updateQuery = updateQuery.slice(0, -1) + ` WHERE id=?`
+            console.log(`updateQuery : ${updateQuery}, notnulcollum : ${notNULLcolumn}\n`);
             notNULLcolumn[j] = req.body.roomID;
             pool.getConnection(function (err, connection) {
                 if (err) {
@@ -157,6 +181,7 @@ router.put('/', (req, res, next) => {
                     connection.query(updateQuery, notNULLcolumn, (sqlErr) => {
                         if (sqlErr) {
                             // TODO : sql 내부 에러 처리
+                            console.log("sql error\n");
                             connection.release();
                             console.log("PUT /roomlist error : SQL 내부 에러. query를 확인해 주세요.");
                             next(new Error('PUT /roomlist error:4'));
@@ -166,12 +191,13 @@ router.put('/', (req, res, next) => {
                         }
                     });
                 }
+                console.log("final\n");
                 console.log(pool._freeConnections.indexOf(connection));
                 connection.release();
                 console.log(pool._freeConnections.indexOf(connection));
             });
             res.end();
-        }
+        }   
     }
 });
 
@@ -185,8 +211,8 @@ router.post('/delete', (req, res, next) => {
     } else {
         // DELETE FROM tablename WHERE condition;
         // 값 삭제
-        var deleteQuery = `DELETE FROM pocarpool.roominfos WHERE id=?; DELETE FROM pocarpool.users_and_rooms_infos WHERE roomID = ?
-                            DELETE FROM pocarpool.messages WHERE roomID=?`;
+        var deleteQuery = `DELETE FROM pocarpool.roominfos WHERE id=?; DELETE FROM pocarpool.users_and_rooms_infos WHERE roomID = ?;
+                            DELETE FROM pocarpool.messages WHERE roomID=?;`;
         pool.getConnection(function (err, connection) {
             if (err) {
                 // TODO : DB에 접근 못 할때
@@ -262,11 +288,14 @@ router.get('/getroom', function (req, res, next) {
 // pass
 router.post('/adduser', function (req, res, next) {
     // TODO : 로그인 에러
+    console.log("adduser - \n", req.session.user);
     if (req.session.user == undefined) {
+        console.log("login err\n");
         next(new Error('POST /roomlist/userid error:0'));
     } else {
-        if (req.session.user.id == NULL) {
+        if (req.session.user.id == undefined) {
             // TODO : 접근 권한 오류
+            console.log("not master\n");
             next(new Error('POST /roomlist/adduser error:2'));
         } else {
             // query
@@ -276,13 +305,16 @@ router.post('/adduser', function (req, res, next) {
                                         AND NOT EXISTS (SELECT * FROM pocarpool.users_and_rooms_infos WHERE userid = ? AND roomid = ? LIMIT 1);`;
             var userID = req.session.user.id;
             var roomID = req.body.roomID;
+            console.log("userid : %d, roomid : %d\n", userID, roomID);
             pool.getConnection(function (err, connection) {
                 if (err) {
                     // TODO : DB에 접근 못 할 때
                     console.log("POST /roomlist/userid error : 서버 이용자가 너무 많습니다.");
+                    console.log("many user\n");
                     connection.release();
                     next(new Error('POST /roomlist/userid error:3'));
                 } else {
+                    console.log("continue\n");
                     connection.query(addUsersRoomQuery, [userID, roomID, userID, roomID, userID, roomID], (err, result) => {
                         if (err) {
                             // TODO : sql 내부 에러 처리
@@ -290,6 +322,7 @@ router.post('/adduser', function (req, res, next) {
                             connection.release();
                             next(new Error('POST /roomlist/userid error:4'));
                         } else {
+                            console.log("here\n");
                             res.status(200);
                         }
                     });
@@ -347,8 +380,9 @@ router.post('/deluser', (req, res, next) => {
 // 3 : TODO : 동시에 너무 많은 접속이 있을 때
 // 4 : TODO : query 에러
 router.use((err, req, res, next) => {
-    console.log("something wrong!\n");
+    console.log("something wrong!!!\n");
     res.json({ message: err.message });
+    res.status(404);
 })
 
 module.exports = router;

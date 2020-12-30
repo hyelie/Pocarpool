@@ -6,6 +6,7 @@ const router = express.Router();
 
 // POST /report
 router.post('/', function (req, res, next) {
+    console.log(`sesseion : ${req.session.user}, isAdmin : %d, id : %d`, req.session.user.isAdmin, req.session.user.id);
     // TODO : 로그인 에러
     if (req.session.user == undefined) {
         console.log("login error")

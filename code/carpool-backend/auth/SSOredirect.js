@@ -2,6 +2,7 @@ var express = require('express');
 const url = require("url");
 var pool = require('../db/initiate').pool;
 var request = require('request');
+const clonedeep = require('lodash.clonedeep');
 
 const ssoRedirect = () => {
   return async function(req, res, next) {
@@ -51,8 +52,8 @@ const ssoRedirect = () => {
                     var useremail = user_info["email"];
                     var userid = user_info["id"]; 
                     var usertype = user_info["type"];
-                    var userreportnum;
-                    var userisAdmin;
+                    //var userreportnum;
+                    //var userisAdmin;
 
                     // 검증 성공시 db확인 후 서버 유저 등록
                     pool.getConnection(function(poolerr, connection){
@@ -64,11 +65,12 @@ const ssoRedirect = () => {
                             console.log("유저정보 확인", username, userid, useremail, usertype);
 
                             // 이미 db에 있는지 확인 후 db에 넣기
-                            var checkuserquery = `SELECT * FROM pocarpool.users WHERE id = (?);`;
+                            var checkuserquery = `SELECT * FROM pocarpool.users WHERE id = ?;`;
                             connection.query(checkuserquery, [userid], (err, results, fields) =>{
                                 
                                 // db에 존재하지 않는 경우에만 db에 추가
                                 if(results.length == 0){
+                                    console.log("not exist\n");
                                     var adduserquery = `INSERT INTO pocarpool.users(name, id, memberEmail, memberType, report_num, isAdmin) VALUES (?, ?, ?, ?, ?, ?)`;
                                     connection.query(adduserquery, [username, userid, useremail , usertype, 0, 0], function (err, results, fields) {
                                         if (err) {
@@ -80,8 +82,9 @@ const ssoRedirect = () => {
                                 }
                                 // db에 있는 경우 정보 꺼내옴
                                 else{
-                                    userreportnum = results.report_num;
-                                    userisAdmin = results.isAdmin;
+                                    console.log("exist\n")
+                                    //userreportnum = results["0"]["report_num"];
+                                    //userisAdmin = results["0"]["isAdmin"];
                                 }
                             })
                         }
@@ -96,13 +99,19 @@ const ssoRedirect = () => {
                     }
                     else{
                         console.log("세션으로 로그인 완료")
+                        //console.log("clone : ", cloneresult);
+                        //var userreportnum = cloneresult["0"]["report_num"];
+                        //var userisAdmin = cloneresult["0"]["isAdmin"];
+                        //console.log("temp : ", userreportnum, userisAdmin);
+                        
                         req.session.user = {
                             id : userid,
                             name : username,
                             email : useremail,
-                            type : usertype,
-                            report_num : userreportnum,
-                            isAdmin : userisAdmin
+                            type : usertype
+                            //type : usertype,
+                            //report_num : userreportnum,
+                            //isAdmin : userisAdmin
                         }
                     }
 
