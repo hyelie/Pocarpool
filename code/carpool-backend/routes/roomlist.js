@@ -347,6 +347,7 @@ router.post('/deluser', (req, res, next) => {
 // 3 : TODO : 동시에 너무 많은 접속이 있을 때
 // 4 : TODO : query 에러
 router.use((err, req, res, next) => {
+    console.log("something wrong!\n");
     res.json({ message: err.message });
 })
 
