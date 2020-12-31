@@ -1,8 +1,7 @@
 var express = require('express');
 const url = require("url");
-var pool = require('../db/initiate').pool;
+var pool = require('../db/initiate').sync_pool;
 var request = require('request');
-const clonedeep = require('lodash.clonedeep');
 
 const ssoRedirect = () => {
   return async function(req, res, next) {
@@ -40,7 +39,7 @@ const ssoRedirect = () => {
                 };
                 
                 // 검증 요청
-                request(options, function (error, response) {
+                request(options, async function (error, response) {
                     if (error) throw new Error(error);
 
                     console.log(response.body);
@@ -52,46 +51,44 @@ const ssoRedirect = () => {
                     var useremail = user_info["email"];
                     var userid = user_info["id"]; 
                     var usertype = user_info["type"];
-                    //var userreportnum;
-                    //var userisAdmin;
+                    var userreportnum;
+                    var userisAdmin;
 
-                    // 검증 성공시 db확인 후 서버 유저 등록
-                    pool.getConnection(function(poolerr, connection){
-                        if (!poolerr) {
-                            /*
-                            * 현재 유저 정보는 아래와 같은 형태로 들어오며, 이에 맞게 db수정 필요
-                            *      {"id":5,"email":"eunchan9029@postech.ac.kr","name":"조은찬","type":"POSTECHIAN"} 
-                            */
-                            console.log("유저정보 확인", username, userid, useremail, usertype);
+                    try{
+                        const connection = await pool.getConnection(async conn => conn);
 
-                            // 이미 db에 있는지 확인 후 db에 넣기
-                            var checkuserquery = `SELECT * FROM pocarpool.users WHERE id = ?;`;
-                            connection.query(checkuserquery, [userid], (err, results, fields) =>{
-                                
-                                // db에 존재하지 않는 경우에만 db에 추가
-                                if(results.length == 0){
-                                    console.log("not exist\n");
-                                    var adduserquery = `INSERT INTO pocarpool.users(name, id, memberEmail, memberType, report_num, isAdmin) VALUES (?, ?, ?, ?, ?, ?)`;
-                                    connection.query(adduserquery, [username, userid, useremail , usertype, 0, 0], function (err, results, fields) {
-                                        if (err) {
-                                            console.log(err)
-                                        } else {
-                                            console.log("등록 완료~");
-                                        }
-                                    });
-                                }
-                                // db에 있는 경우 정보 꺼내옴
-                                else{
-                                    console.log("exist\n")
-                                    //userreportnum = results["0"]["report_num"];
-                                    //userisAdmin = results["0"]["isAdmin"];
-                                }
-                            })
+                        console.log("유저정보 확인", username, userid, useremail, usertype);
+
+                        // 이미 db에 있는지 확인 후 db에 넣기
+                        var checkuserquery = `SELECT * FROM pocarpool.users WHERE id = ?;`;
+                        var [rows] = await connection.query(checkuserquery, [userid]);
+
+                        console.log(rows);
+
+                        // db에 존재하지 않는 경우에만 db에 추가
+                        if(rows.length == 0){
+                            console.log("not exist\n");
+                            var adduserquery = `INSERT INTO pocarpool.users(name, id, memberEmail, memberType, report_num, isAdmin) VALUES (?, ?, ?, ?, ?, ?)`;
+                            var [rows2] = await connection.query(adduserquery, [username, userid, useremail , usertype, 0, 0]);
+                            console.log("등록 완료~");
+
+                            userreportnum = 0;
+                            userisAdmin = 0;
                         }
-                        console.log(pool._freeConnections.indexOf(connection));
+                        else{
+                            console.log("exist\n")
+                            userreportnum = rows["0"]["report_num"];
+                            userisAdmin = rows["0"]["isAdmin"];
+                        }
+
                         connection.release();
-                        console.log(pool._freeConnections.indexOf(connection));
-                    });
+
+                    } catch(err){
+                        console.log('DB Error');
+		                return res.redirect(`/`);
+                    }
+
+                    console.log("temp : ", userreportnum, userisAdmin);
                 
                     // 세션을 통한 로그인
                     if(req.session.user){ // 이미 로그인 되어있는경우
@@ -99,19 +96,14 @@ const ssoRedirect = () => {
                     }
                     else{
                         console.log("세션으로 로그인 완료")
-                        //console.log("clone : ", cloneresult);
-                        //var userreportnum = cloneresult["0"]["report_num"];
-                        //var userisAdmin = cloneresult["0"]["isAdmin"];
-                        //console.log("temp : ", userreportnum, userisAdmin);
                         
                         req.session.user = {
                             id : userid,
                             name : username,
                             email : useremail,
-                            type : usertype
-                            //type : usertype,
-                            //report_num : userreportnum,
-                            //isAdmin : userisAdmin
+                            type : usertype,
+                            report_num : userreportnum,
+                            isAdmin : userisAdmin
                         }
                     }
 

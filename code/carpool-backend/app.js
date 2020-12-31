@@ -15,8 +15,8 @@ var chatRouter = require('./routes/chat');
 const { join } = require('path');
 var chatActivity = require('./routes/socket').chatActivity;
 
-// var IsLogined = require('./auth/IsLogined');
-// var SSOredirect = require('./auth/SSOredirect');
+var IsLogined = require('./auth/IsLogined');
+var SSOredirect = require('./auth/SSOredirect');
 
 var app = express();
 
@@ -42,8 +42,8 @@ app.use(session({
   cookie: { maxAge: 3600000, httpOnly: true },
 }));
 
-// app.get("/auth/login_process",SSOredirect());
-// app.get("/auth/login", IsLogined);
+app.get("/auth/login_process",SSOredirect());
+app.get("/auth/login", IsLogined);
 
 
 app.use('/', indexRouter);

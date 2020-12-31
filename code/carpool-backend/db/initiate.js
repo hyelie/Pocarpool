@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+var mysql2 = require('mysql2/promise');
 const { connect } = require('../app');
 
 var initQuery = {
@@ -70,12 +71,23 @@ exports.pool = mysql.createPool({
 
 
   user : 'poapper',
-  password : 'djffls><akdrh123',
+  password : 'poapper',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
-  socketPath: '/var/run/mysqld/mysqld.sock'
+  //socketPath: '/var/run/mysqld/mysqld.sock'
 });  
+
+exports.sync_pool = mysql2.createPool({
+  host : 'localhost',
+  user : 'poapper',
+  password : 'poapper',
+  database : 'pocarpool',
+  multipleStatements : true,
+  waitForConnections : true,
+  connectionLimit : 1000,
+  //socketPath: '/var/run/mysqld/mysqld.sock'
+}); 
 
 exports.checkQuery = {
   checkDBs : `SHOW DATABASES;`,
