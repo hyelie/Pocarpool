@@ -3,13 +3,14 @@ const express = require('express');
 const { PayloadTooLarge } = require('http-errors');
 const router = express.Router();
 var pool = require('../db/initiate').pool;
+var syncpool = require('../db/initiate').sync_pool;
 // 미구현된 부분은 TODO : task의 형식으로 달았다.
 
 
 
 // POST /roomlist
 // (필수적으로) 입력 되는 값: car_type, depart_place, arrive_place, depart_time, arrive_time
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
     console.log("post /roomlist in");
     // TODO : 로그인 에러
     if (req.session.user == undefined) {
@@ -38,17 +39,31 @@ router.post('/', (req, res, next) => {
             // 1. MySql query문 만들기
             //`'${car_type}','${depart_place}','${arrive_place}','${depart_time}','${arrive_time}'` 와 같은 형태를 취한다
             //시간: 2020-07-29 14:10:23 형태를 한다
-            var sql = `INSERT INTO pocarpool.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,?,?,?,?,0,NOW())`;
+            var sql = `INSERT INTO pocarpool.roominfos (car_type, depart_place, arrive_place, depart_time, arrive_time,current_headcount, total_headcount, current_carrier_num, total_carrier_num, isConfirm, confirm_time) VALUES(?,?,?,?,?,?,?,?,?,0,NOW());
+                        SELECT LAST_INSERT_ID();`;
+            var maked_room_id;
 
-            pool.getConnection(function (err1, connection) {
-                if (!err1) {
-                    connection.query(sql, [car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num], (err2, rows, fields) => {
-                        if (err2) throw err2;
-                    });
+            try{
+                const connection = await syncpool.getConnection(async conn => conn);
+
+                try{
+                    var [rows] = await connection.query(sql, [car_type, depart_place, arrive_place, depart_time, arrive_time, current_headcount, total_headcount, current_carrier_num, total_carrier_num]);
+                } catch(err2){
+                    console.log("query err");
                 }
-                console.log(pool._freeConnections.indexOf(connection));
+
+                console.log("rosw info");
+                console.log(rows[1][0]);
+                maked_room_id = rows[1][0]['LAST_INSERT_ID()'];
+
                 connection.release();
-                console.log(pool._freeConnections.indexOf(connection));
+
+            } catch(err1){
+                console.log("sync_pool err");
+            } 
+
+            res.json({
+                "roomid" : maked_room_id
             });
             res.status(200).end();
         }
