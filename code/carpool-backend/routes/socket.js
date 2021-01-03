@@ -60,7 +60,7 @@ exports.chatActivity = (socket,io) => {
           connection.query(chatQuery, [roomID, sentTime, sendUserID, chat_content], (err) => {
             if (err) {
               // TODO : sql 내부 에러 처리
-              //console.log(err);
+              console.log(err);
               console.log("DB에 값 추가 안 됨!");
             } else {
               console.log("DB에 값 추가 완료!");

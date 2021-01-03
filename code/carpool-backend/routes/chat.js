@@ -12,17 +12,19 @@ router.get('/', function(req, res, next) {
 });
 
 // POST /chat/getmsg
-// post 방식. req.body에 roomID, sendTime, sendUserID, chat_content가 들어있다.
+// post 방식. req.body에 datatime이 들어있다.
 router.post('/getmsg', function(req, res, next){
 
     var time = req.body.datetime;
-    var userID = req.session.user.userID;
+    var userID = req.session.user.id;
     
     // TODO : 로그인 에러
      if (req.session.user == undefined) {
         next(new Error('POST /chat/getmsg error:0'));
-    } else {
-        console.log("문제가 뭔자");
+    } else if(time == undefined){
+        next(new Error('POST /chat/getmsg error:1'));
+    }else {
+        console.log(`datetime : ${time}, userID : ${userID}`);
             // userid가 속한 방에 대한 정보 출력, ./db/testquery 파일 참고.
             var msgQuery = `SELECT pocarpool.messages.roomID, pocarpool.messages.sendTime, pocarpool.messages.sendUserID, pocarpool.messages.chat_content
                                 FROM pocarpool.messages INNER JOIN pocarpool.users_and_rooms_infos

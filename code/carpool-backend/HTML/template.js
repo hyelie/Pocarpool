@@ -83,9 +83,9 @@ exports.template = {
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+    const socket = io.connect('https://pocarpool.poapper.com');
       $(() => {
         const name = prompt('What your name');
-        const socket = io();
         let room = ['room1', 'room2'];
         let num = 1;
     

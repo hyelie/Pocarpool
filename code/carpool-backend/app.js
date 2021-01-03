@@ -52,7 +52,7 @@ app.use('/roomlist', roomlistRouter);
 app.use('/report', reportRouter);
 app.use('/chat', chatRouter);
 app.io.on('connection', (socket)=>{
-  chatActivity(socket,app.io)
+  chatActivity(socket,app.io);
 });
 
 // catch 404 and forward to error handler

@@ -92,10 +92,10 @@ const ssoRedirect = () => {
                 
                     // 세션을 통한 로그인
                     if(req.session.user){ // 이미 로그인 되어있는경우
-                        console.log("이미 로그인 되어있음. (이럴 수 있나?)")
+                        console.log("이미 로그인 되어있음. (이럴 수 있나?)");
                     }
                     else{
-                        console.log("세션으로 로그인 완료")
+                        console.log("세션으로 로그인 완료");
                         
                         req.session.user = {
                             id : userid,
