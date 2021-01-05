@@ -87,25 +87,25 @@ exports.template = {
       $(() => {
         const name = prompt('What your name');
         let room = ['room1', 'room2'];
-        let num = 1;
+        let num = 0;
     
         socket.emit('joinRoom', num, name);
-    
+        
         $('select').change(() => {
           socket.emit('leaveRoom', num, name);
           num++;
-          num = num % 2; num++;
+          num = num % 2;
           socket.emit('joinRoom', num, name);
         });
     
         
         $('form').submit(() => {
-          socket.emit('chat message', num, name, $('#m').val());
+          socket.emit('chatMsg', num, name, $('#m').val());
           $('#m').val('');
           return false;
         });
     
-        socket.on('chat message', (name, msg) => {
+        socket.on('sendMsg', (name, msg) => {
           $('#messages').append($('<li>').text(name + '  :  ' +msg));
         });
     
