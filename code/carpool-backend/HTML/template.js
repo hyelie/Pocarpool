@@ -105,8 +105,10 @@ exports.template = {
           return false;
         });
     
-        socket.on('sendMsg', (name, msg) => {
-          $('#messages').append($('<li>').text(name + '  :  ' +msg));
+        socket.on('sendMsg', (object) => {
+          var arr = JSON.parse(object);
+
+          $('#messages').append($('<li>').text(arr.user + '  :  ' +arr.msg));
         });
     
         socket.on('leaveRoom', (num, name) => {
