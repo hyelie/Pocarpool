@@ -4,7 +4,7 @@
   // disconnect라는 이벤트가 발생하면 유저의 연결을 끊어 줌.
 var pool = require('../db/initiate').pool;
 
-exports.chatActivity = (socket,io) => {
+exports.chatActivity = (socket, io) => {
     console.log("a user connected");
     socket.on('disconnect', () => {
       console.log("a user disconnected");
@@ -36,7 +36,17 @@ exports.chatActivity = (socket,io) => {
     // 마찬가지로 user가 define되어있을 때만 socket이 작동함.
     if (user != undefined) {
       //console.log("방 번호 : ", roomnum, "username : ", user, "chatMsg : ", msg, roomnum);
-      io.to(roomnum).emit('sendMsg', user, msg);
+      var content = {
+        'user' : user,
+        'msg' : msg
+      }
+      
+      io.to(roomnum).emit('sendMsg', JSON.stringify(content));
+
+      //io.to(roomnum).emit('example', msg);
+
+
+
 
       // DB에 채팅내용 추가.
 
