@@ -30,4 +30,9 @@ router.get('/logout', function (req, res, next) {
     });
 });
 
+router.get('/login_success', (req, res, next) => {
+    console.log("로그인 성공 창");
+    res.status(200).send('login_success');
+})
+
 module.exports = router;

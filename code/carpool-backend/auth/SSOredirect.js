@@ -107,7 +107,7 @@ const ssoRedirect = () => {
                         }
                     }
 
-                    return res.redirect(`/`);
+                    return res.status(300).redirect(`/auth/login_success`);
                 });
             }
             else{
