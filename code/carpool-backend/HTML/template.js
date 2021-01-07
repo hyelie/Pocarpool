@@ -86,6 +86,7 @@ exports.template = {
     const socket = io.connect('https://pocarpool.poapper.com');
       $(() => {
         const name = prompt('What your name');
+        const id = prompt('what is your user identifier');
         let room = ['room1', 'room2'];
         let num = 0;
     
@@ -100,13 +101,15 @@ exports.template = {
     
         
         $('form').submit(() => {
-          socket.emit('chatMsg', num, name, $('#m').val());
+          socket.emit('chatMsg', num, name, $('#m').val(), id);
           $('#m').val('');
           return false;
         });
     
         socket.on('sendMsg', (object) => {
+          console.log(object);
           var arr = JSON.parse(object);
+          $('#messages').append($('<li>').text(object));
 
           $('#messages').append($('<li>').text(arr.user + '  :  ' +arr.msg));
         });

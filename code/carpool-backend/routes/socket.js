@@ -31,17 +31,29 @@ exports.chatActivity = (socket, io) => {
 
   // 3. chatMsg
   // 인자는 방 번호인 roomnum, 사용자인 user, 메시지 내용인 msg.
-  socket.on('chatMsg', (roomnum, user, msg) => {
-    console.log(`roomnum : ${roomnum}, userid : ${user}, msg : ${msg} `);
+  socket.on('chatMsg', (roomnum, user, msg, userid) => {
+    console.log(`roomnum : ${roomnum}, user name : ${user}, msg : ${msg} , userid : ${userid}`);
     // 마찬가지로 user가 define되어있을 때만 socket이 작동함.
     if (user != undefined) {
       //console.log("방 번호 : ", roomnum, "username : ", user, "chatMsg : ", msg, roomnum);
       var content = {
-        'user' : user,
-        'msg' : msg
+        "user" : user,
+        "msg" : msg
       }
+      // console.log("1:",content);
+      var myJSON = JSON.stringify(content);
+      // console.log("2:",myJSON);
+
+      // var content2 = new Object();
+      // content2.user = user;
+      // content2.msg = msg;
+      // var myJSON2 = JSON.stringify(content2);
+      // console.log("3:",myJSON2);
+
+      // console.log("4:",content2);
       
-      io.to(roomnum).emit('sendMsg', JSON.stringify(content));
+      io.to(roomnum).emit('sendMsg', myJSON);
+      // console.log(myJSON);
 
       //io.to(roomnum).emit('example', msg);
 
@@ -56,7 +68,7 @@ exports.chatActivity = (socket, io) => {
       var sentTime = getFormatDate(ctime);
       // YYYY-MM-DD HH:MM:SS
       // TODO : 일단은 송신 시간을 넣어뒀음 근데 폰에서 보낸 시간이랑 서버에서 저장한 시간 다를 수 있기 때문에 socket.on chatMsg에서 time 보내는 편이 좋을 듯.
-      var sendUserID = user;
+      var sendUserID = userid;
       var chat_content = msg;
 
       // 먼저 서버의 db에 입력받은 값을 넣어준다.
