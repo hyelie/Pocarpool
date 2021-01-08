@@ -37,6 +37,7 @@ exports.chatActivity = (socket, io) => {
     if (user != undefined) {
       //console.log("방 번호 : ", roomnum, "username : ", user, "chatMsg : ", msg, roomnum);
       var content = {
+        "userid" : userid,
         "user" : user,
         "msg" : msg
       }
