@@ -71,22 +71,22 @@ exports.pool = mysql.createPool({
 
 
   user : 'poapper',
-  password : 'djffls><akdrh123',
+  password : 'poapper',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
-  socketPath: '/var/run/mysqld/mysqld.sock'
+  //socketPath: '/var/run/mysqld/mysqld.sock'
 });  
 
 exports.sync_pool = mysql2.createPool({
   host : 'localhost',
   user : 'poapper',
-  password : 'djffls><akdrh123',
+  password : 'poapper',
   database : 'pocarpool',
   multipleStatements : true,
   waitForConnections : true,
   connectionLimit : 1000,
-  socketPath: '/var/run/mysqld/mysqld.sock'
+  //socketPath: '/var/run/mysqld/mysqld.sock'
 }); 
 
 exports.checkQuery = {

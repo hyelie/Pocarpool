@@ -32,7 +32,14 @@ router.get('/logout', function (req, res, next) {
 
 router.get('/login_success', (req, res, next) => {
     console.log("로그인 성공 창");
-    res.status(200).send('login_success');
+    res.status(200).json({
+        id : req.session.user.id,
+        name : req.session.user.name,
+        email : req.session.user.email,
+        type : req.session.user.type,
+        report_num : req.session.user.report_num,
+        isAdmin : req.session.user.isAdmin
+    });
 })
 
 module.exports = router;

@@ -7,11 +7,11 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  if(req.user == undefined){
+  if(req.session.user == undefined){
     console.log("로그인 확인", req.user);
-    res.send(template.home(req));
+    res.redirect('/auth/login');
   } else{
-    res.redirect('/login');
+    res.redirect('/auth/login_success');
   }
 });
 
