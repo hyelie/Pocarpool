@@ -14,6 +14,8 @@ Pocarpool은 포스텍 구성원들이 접근할 수 있는 카풀 어플리케�
 
 그러나 카풀에 참여할 사람들을 모집하는 곳은 에브리타임, 포비스 라운지 등으로 산재되어 있습니다. 포카풀은 **산재되어 있는 카풀 수요를 하나로 묶어주는 플랫폼**입니다. 
 
+<br>
+
 ## 기능
 1. 카풀 방 CRUD
  - 사용자가 원하는 카풀 방 검색
@@ -26,11 +28,15 @@ Pocarpool은 포스텍 구성원들이 접근할 수 있는 카풀 어플리케�
 3. 신고
  - 어뷰징을 막기 위한 신고
 
+ <br>
+
 ## 기술 스택
 - [Node.js](https://nodejs.org/ko/) - 비동기 서버용 JavaScript 런타임
 - [Express.js](https://expressjs.com/) - Node.js용 웹 애플리케이션 프레임워크
 - [Socket.io](https://socket.io/) - WebSocket을 통한 실시간 통신 라이브러리
 - [MySQL](https://www.mysql.com/) - 관계형 데이터베이스 관리 시스템
+
+<br>
 
 ## 초기 환경 구성(Getting started)
 ### NVM 설치
@@ -67,6 +73,8 @@ cd code/carpool-backend
 npm i                        # node module 설치
 node ./bin/www               # 서버 실행
 ```
+
+<br>
 
 ## 팀 정보
 백엔드 팀
