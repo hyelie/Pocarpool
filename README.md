@@ -81,5 +81,5 @@ node ./bin/www               # 서버 실행
 
 |이름|역할|Github|Contact|
 |:---|----|----|----|
-|정혜일|API 및 채팅 구현|<a href="https://github.com/hyelie"><img src="http://img.shields.io/badge/hyelie-green?style=social&logo=github"/></a>|<a href="hyelie@postech.ac.kr"><img src="https://img.shields.io/badge/hyelie@postech.ac.kr-green?logo=microsoft-outlook&style=social"/></a>|
-|조은찬|API 및 인증 구현|<a href="https://github.com/Chipmunk-g4"><img src="http://img.shields.io/badge/Chipmunk_g4-green?style=social&logo=github"/></a>|<a href="eunchan9029@postech.ac.kr"><img src="https://img.shields.io/badge/eunchan9029@postech.ac.kr-green?logo=microsoft-outlook&style=social"/></a>|
+|정혜일|API 및 채팅 구현|<a href="https://github.com/hyelie"><img src="http://img.shields.io/badge/hyelie-green?style=social&logo=github"/></a>|<a href="mailto:hyelie@postech.ac.kr"><img src="https://img.shields.io/badge/hyelie@postech.ac.kr-green?logo=microsoft-outlook&style=social"/></a>|
+|조은찬|API 및 인증 구현|<a href="https://github.com/Chipmunk-g4"><img src="http://img.shields.io/badge/Chipmunk_g4-green?style=social&logo=github"/></a>|<a href="mailto:eunchan9029@postech.ac.kr"><img src="https://img.shields.io/badge/eunchan9029@postech.ac.kr-green?logo=microsoft-outlook&style=social"/></a>|
