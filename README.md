@@ -1,7 +1,7 @@
 # Pocarpool - POSTECH Carpool Application
 
 <p align="center">
-	<img src="./.images/banner.png">
+	<img src="./image/banner.png">
 </p>
 
 <p align="center">
