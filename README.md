@@ -1,6 +1,10 @@
 # Pocarpool - POSTECH Carpool Application
 
 <p align="center">
+	<img src="./.images/banner.png">
+</p>
+
+<p align="center">
 <a href="https://gitlab.com/hyelie/carpool_backend/-/wikis/home">개발 위키</a> 
 | 
 <a href="https://gitlab.com/hyelie/carpool_backend/-/issues">이슈</a> 
