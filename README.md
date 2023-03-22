@@ -10,6 +10,8 @@
 <a href="https://gitlab.com/hyelie/carpool_backend/-/issues">이슈</a> 
 | 
 <a href="https://gitlab.com/hyelie/carpool_backend/-/milestones">마일스톤</a> 
+|
+<a href="https://gitlab.com/hyelie/carpool_backend/-/blob/master/pocarpool_presentation.pdf">발표 자료</a> 
 </p>
 
 Pocarpool은 포스텍 구성원들이 접근할 수 있는 카풀 어플리케이션입니다.
